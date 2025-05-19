@@ -1,0 +1,22 @@
+﻿@page "/chronicle"
+@inherits GameTabPageBase
+@inject IDialogService DialogService
+@using ProgressKnightFantasy.Services
+<MudPaper Class="pa-4" Elevation="0">
+    <MudText Typo="Typo.h5" GutterBottom="true">Manage Your Chronicle (Save & Load)</MudText>
+    <MudGrid Spacing="3">
+        <MudItem xs="12" md="4"><MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="HandleSaveGame" FullWidth="true" Class="my-1">Save Chronicle</MudButton></MudItem>
+        <MudItem xs="12" md="4"><MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="HandleLoadGame" FullWidth="true" Class="my-1">Load Chronicle</MudButton></MudItem>
+        <MudItem xs="12" md="4"><MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="HandleDeleteSave" FullWidth="true" Class="my-1">Erase Chronicle</MudButton></MudItem>
+    </MudGrid>
+    @if (lastSaveLoadMessage != null)
+    {
+        <MudText Class="mt-4">@lastSaveLoadMessage</MudText>
+    }
+    <MudText Class="mt-2">Last entry: @(GameState.CurrentGameData.LastSaveTime == DateTime.MinValue ? "Never" : GameState.CurrentGameData.LastSaveTime.ToLocalTime().ToString("g"))</MudText>
+</MudPaper>
+@code {
+    private string? lastSaveLoadMessage; private async Task HandleSaveGame() { await GameState.SaveGameAsync(); lastSaveLoadMessage = $"Chronicle Saved at {DateTime.Now.ToShortTimeString()}"; }
+    private async Task HandleLoadGame() { await GameState.LoadGameAsync(); lastSaveLoadMessage = GameState.CurrentGameData.LastSaveTime == DateTime.MinValue ? "No chronicle found or new saga begun." : $"Chronicle Loaded. Last entry was at {GameState.CurrentGameData.LastSaveTime.ToLocalTime():g}"; }
+    private async Task HandleDeleteSave() { if (await DialogService.ShowMessageBox("Erase Chronicle", "Are you sure? This cannot be undone and all echoes of your deeds will vanish.", yesText: "Erase It!", cancelText: "Preserve It") == true) { await GameState.DeleteSaveAsync(); lastSaveLoadMessage = "Chronicle erased. A new saga awaits."; } }
+}

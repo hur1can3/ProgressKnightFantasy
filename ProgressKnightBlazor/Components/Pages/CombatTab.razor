@@ -1,0 +1,78 @@
+﻿@page "/battlegrounds"
+@inherits GameTabPageBase
+@using ProgressKnightFantasy.Game.Models
+<MudPaper Class="pa-4" Elevation="0">
+    <MudText Typo="Typo.h4" GutterBottom="true">Battlegrounds</MudText>
+    <MudGrid Spacing="3">
+        <MudItem xs="12" md="4">
+            <MudPaper Class="pa-3" Elevation="2">
+                <MudText Typo="Typo.h6">Your Prowess</MudText>
+                <MudText>Level: @GameState.CurrentGameData.CurrentRun.PlayerLevel.ToString("N0")</MudText>
+                <MudProgressLinear Color="@PlayerHealthColor()" Size="Size.Large" Value="@PlayerHealthPercent()" Class="my-2"><MudText Typo="Typo.caption" Class="px-2">HP: @GameState.CurrentGameData.CurrentRun.PlayerCurrentHealth.ToString("N0") / @GameState.CalculatePlayerMaxHealth().ToString("N0")</MudText></MudProgressLinear>
+                <MudText>Attack: @GameState.CalculatePlayerAttack().ToString("N1")</MudText>
+                <MudText>Defense: @GameState.CalculatePlayerDefense().ToString("N1")</MudText>
+                <MudText Typo="Typo.caption">Health Regen/sec: @GameState.CalculatePlayerHealthRegen().ToString("N1") (when not in combat)</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" md="8">
+            @if (!string.IsNullOrEmpty(GameState.CurrentGameData.CurrentEnemyId))
+            {
+                var enemyDef = GameDataDefinitions.GetEnemyById(GameState.CurrentGameData.CurrentEnemyId); if (enemyDef != null)
+                {
+                    <MudPaper Class="pa-3" Elevation="2">
+                        <MudText Typo="Typo.h6">Engaged: @enemyDef.Name</MudText>
+                        @if (!string.IsNullOrEmpty(enemyDef.Description))
+                        {
+                            <MudText Typo="Typo.body2" Class="mb-1"><i>@enemyDef.Description</i></MudText>
+                        }
+                        <MudProgressLinear Color="Color.Error" Size="Size.Large" Value="EnemyHealthPercent(enemyDef)" Class="my-2"><MudText Typo="Typo.caption" Class="px-2">HP: @GameState.CurrentGameData.CurrentEnemyHealth.ToString("N0") / @enemyDef.MaxHealth.ToString("N0")</MudText></MudProgressLinear>
+                        <MudText>Attack: @enemyDef.Attack.ToString("N0"), Defense: @enemyDef.Defense.ToString("N0")</MudText>
+                        <MudButton Variant="Variant.Filled" Color="Color.Warning" OnClick="GameState.FleeCombat" Disabled="GameState.CurrentGameData.CurrentRun.PlayerCurrentHealth <= 0" Class="mt-2">Retreat</MudButton>
+                    </MudPaper>
+                }
+            }
+            else
+            {
+                <MudPaper Class="pa-3" Elevation="2" Style="min-height: 150px; display:flex; align-items:center; justify-content:center;"><MudText Typo="Typo.h6">The field is clear. Select a foe.</MudText></MudPaper>
+            }
+        </MudItem>
+        <MudItem xs="12">
+            <MudPaper Class="pa-3 mt-3" Elevation="1" Style="max-height: 200px; overflow-y: auto; font-family: monospace; font-size: 0.875rem;">
+                <MudText Typo="Typo.h6" GutterBottom="true">Battle Log</MudText> @if (GameState.CombatLog.Any())
+                {
+                    foreach (var logEntry in GameState.CombatLog)
+                    {
+                        <MudText Typo="Typo.body2">@logEntry</MudText>
+                    }
+                }
+                else
+                {
+                    <MudText Typo="Typo.body2">Awaiting the clash of steel...</MudText>
+                }
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12"><MudText Typo="Typo.h5" Class="mt-4 mb-2">Potential Adversaries</MudText></MudItem>
+        @foreach (var enemy in GameState.AllEnemies.OrderBy(e => e.RequiredPlayerLevel))
+        {
+            bool canFight = string.IsNullOrEmpty(GameState.CurrentGameData.CurrentEnemyId) && GameState.CurrentGameData.CurrentRun.PlayerCurrentHealth > 0;
+            bool levelSufficient = GameState.CurrentGameData.CurrentRun.PlayerLevel >= enemy.RequiredPlayerLevel;
+            string buttonText = levelSufficient ? "Engage" : $"Engage (Lvl {enemy.RequiredPlayerLevel})";
+            <MudItem xs="12" sm="6" md="4">
+                <MudCard Elevation="2" Style="@(levelSufficient ? "" : "opacity:0.7")">
+                    <MudCardHeader><CardHeaderContent><MudText Typo="Typo.h6">@enemy.Name</MudText><MudText Typo="Typo.caption">Req. Lvl: @enemy.RequiredPlayerLevel (@enemy.Faction)</MudText></CardHeaderContent></MudCardHeader>
+                    <MudCardContent><MudText>HP: @enemy.MaxHealth, Atk: @enemy.Attack, Def: @enemy.Defense</MudText><MudText Typo="Typo.body2">Rewards: @enemy.PlayerXpReward XP, @enemy.CoinReward Silver</MudText></MudCardContent>
+                    <MudCardActions><MudButton Variant="Variant.Filled" Color="levelSufficient ? Color.Error : Color.Default" OnClick="() => GameState.StartCombat(enemy.Id)" Disabled="!canFight">@buttonText</MudButton></MudCardActions>
+                </MudCard>
+            </MudItem>
+        }
+        @if (!GameState.AllEnemies.Any())
+        {
+            <MudItem xs="12"><MudText>The battlegrounds are eerily quiet.</MudText></MudItem>
+        }
+    </MudGrid>
+</MudPaper>
+@code {
+    private double PlayerHealthPercent() { double maxHp = GameState.CalculatePlayerMaxHealth(); if (maxHp == 0) return 0; return (GameState.CurrentGameData.CurrentRun.PlayerCurrentHealth / maxHp) * 100; }
+    private Color PlayerHealthColor() { var percent = PlayerHealthPercent(); if (percent > 60) return Color.Success; if (percent > 30) return Color.Warning; return Color.Error; }
+    private double EnemyHealthPercent(EnemyDefinition enemyDef) { if (enemyDef == null || enemyDef.MaxHealth == 0) return 0; return (GameState.CurrentGameData.CurrentEnemyHealth / enemyDef.MaxHealth) * 100; }
+}

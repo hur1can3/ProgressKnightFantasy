@@ -1,0 +1,59 @@
+﻿@page "/market"
+@inherits GameTabPageBase
+@using ProgressKnightFantasy.Game.Models
+<MudPaper Class="pa-4" Elevation="0">
+    <MudText Typo="Typo.h4" GutterBottom="true">Marketplace Wares</MudText>
+    <MudText Typo="Typo.subtitle1" Class="mb-2">Acquire gear and supplies. These are lost upon Rebirth.</MudText>
+    <MudText Typo="Typo.h6" Class="mb-4">Your Silver Pieces: <MudChip T="string" T="string" Label="true" Color="Color.Warning">@GameState.CurrentGameData.Coins.ToString("N2")</MudChip></MudText>
+    <MudGrid Spacing="3">
+        @foreach (var item in GameState.AllShopItems.OrderBy(i => GameState.GetShopItemLevel(i.Id) >= (i.ItemType == ShopItemType.OneTimePurchase ? 1 : i.MaxLevel)).ThenBy(i => i.Name))
+        {
+            int currentLevel = GameState.GetShopItemLevel(item.Id); double cost = 0; bool canAfford = false; bool requirementsMet = true;
+            bool fullyUpgraded = (item.ItemType == ShopItemType.LeveledUpgrade && currentLevel >= item.MaxLevel) || (item.ItemType == ShopItemType.OneTimePurchase && currentLevel > 0);
+            if (!fullyUpgraded) { cost = item.CostFormula(currentLevel); canAfford = GameState.CurrentGameData.Coins >= cost; foreach (var req in item.Requirements) { if (req.Key == "playerlevel" && GameState.CurrentGameData.CurrentRun.PlayerLevel < req.Value) { requirementsMet = false; break; } else if (req.Key.StartsWith("task:") && GameState.GetTaskLevel(req.Key.Substring(5)) < req.Value) { requirementsMet = false; break; } else if (req.Key.StartsWith("skill:") && GameState.GetSkillLevel(req.Key.Substring(6)) < req.Value) { requirementsMet = false; break; } else if (req.Key.StartsWith("joblevel:") && GameState.GetJobLevel(req.Key.Substring(9)) < req.Value) { requirementsMet = false; break; } } }
+            bool canBuyThisItem = !fullyUpgraded && canAfford && requirementsMet;
+            <MudItem xs="12" sm="6" md="4">
+                <MudCard Elevation="fullyUpgraded ? 1 : (canBuyThisItem ? 3 : 2)" Style="@(requirementsMet ? "" : "opacity: 0.7;")">
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h6">@item.Name</MudText>@if (item.ItemType == ShopItemType.LeveledUpgrade)
+                            {
+                                <MudText Typo="Typo.caption">Level: @currentLevel / @item.MaxLevel</MudText>
+                            }
+                            else if (currentLevel > 0)
+                            {
+                                <MudText Typo="Typo.caption" Color="Color.Success">Acquired</MudText>
+                            }
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudText Typo="Typo.body2">@item.GetDescription(currentLevel)</MudText>@if (!fullyUpgraded)
+                        {
+                            <MudText Typo="Typo.body2" Class="mt-1"><i>@item.GetNextLevelDescription(currentLevel)</i></MudText> <MudText Typo="Typo.subtitle2" Class="mt-1">Cost: <MudChip T="string" T="string" Label="true" Size="Size.Small" Color="Color.Warning">@($"{cost:N2} Silver")</MudChip></MudText> @if (!requirementsMet)
+                            {
+                                <MudTooltip Text="@GameState.GetShopItemRequirementsTooltip(item.Id)" MaxWidth="MaxWidth.Medium" Arrow="true" Placement="Placement.Bottom"><MudText Typo="Typo.caption" Color="Color.Error" Class="mt-1">Locked (Requirements not met)</MudText></MudTooltip>
+                            }           }
+                    </MudCardContent>
+                    <MudCardActions>
+                        @if (!fullyUpgraded)
+                        {
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="() => GameState.BuyShopItem(item.Id)" Disabled="!canBuyThisItem">@(item.ItemType == ShopItemType.OneTimePurchase ? "Purchase" : "Upgrade")</MudButton>
+                        }
+                        else if (item.ItemType == ShopItemType.LeveledUpgrade)
+                        {
+                            <MudChip T="string" T="string" Label="true" Color="Color.Success">Max Level</MudChip>
+                        }
+                        else if (item.ItemType == ShopItemType.OneTimePurchase)
+                        {
+                            <MudChip T="string" T="string" Label="true" Color="Color.Success">Acquired</MudChip>
+                        }
+                    </MudCardActions>
+                </MudCard>
+            </MudItem>
+        }
+        @if (!GameState.AllShopItems.Any())
+        {
+            <MudItem xs="12"><MudText>The market stalls are empty for now.</MudText></MudItem>
+        }
+    </MudGrid>
+</MudPaper>

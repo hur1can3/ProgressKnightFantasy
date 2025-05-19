@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35931.197
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProgressKnightFantasy", "ProgressKnightBlazor\ProgressKnightFantasy.csproj", "{0F0710A4-24EF-48E8-AC77-597AEF6FB4CD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0F0710A4-24EF-48E8-AC77-597AEF6FB4CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F0710A4-24EF-48E8-AC77-597AEF6FB4CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F0710A4-24EF-48E8-AC77-597AEF6FB4CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F0710A4-24EF-48E8-AC77-597AEF6FB4CD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {85658EED-A948-4D51-B57D-A89DB64E97E3}
+	EndGlobalSection
+EndGlobal

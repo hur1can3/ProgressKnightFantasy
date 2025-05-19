@@ -1,0 +1,36 @@
+﻿@page "/talents"
+@inherits GameTabPageBase
+@using ProgressKnightFantasy.Components.Abstract
+@using ProgressKnightFantasy.Game.Models
+
+<MudPaper Class="pa-4" Elevation="0">
+    <MudText Typo="Typo.h4" GutterBottom="true">Talents & Abilities</MudText>
+    <MudText Typo="Typo.subtitle1" Class="mb-4">Hone your innate talents and learned abilities. These are permanent and persist through Rebirth.</MudText>
+    <MudGrid Spacing="3">
+        @foreach (var skill in GameState.AllSkills.OrderBy(s => !GameState.CurrentGameData.UnlockedSkillIds.Contains(s.Id)).ThenBy(s => s.Category).ThenBy(s => s.Name))
+        {
+            bool isUnlocked = GameState.CurrentGameData.UnlockedSkillIds.Contains(skill.Id);
+            <MudItem xs="12" sm="6" md="4">
+                <MudCard Elevation="isUnlocked ? 2 : 1" Style="@(isUnlocked ? "" : "opacity: 0.65;")">
+                    <MudCardHeader><CardHeaderContent><MudText Typo="Typo.h6">@skill.Name</MudText><MudText Typo="Typo.caption">Category: @skill.Category</MudText></CardHeaderContent></MudCardHeader>
+                    <MudCardContent>
+                        <MudText Typo="Typo.body2">@skill.Description</MudText>
+                        @if (isUnlocked)
+                        {
+                            <MudText Typo="Typo.h5" Class="mt-2">Level: @GameState.GetSkillLevel(skill.Id).ToString("N1")</MudText>
+                            <MudText Typo="Typo.caption"><i>Effect: @skill.EffectDescription</i></MudText>
+                        }
+                        else
+                        {
+                            <MudText Typo="Typo.caption" Color="Color.Warning" Class="mt-1">Undiscovered</MudText>
+                        }
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+        }
+        @if (!GameState.AllSkills.Any(s => GameState.CurrentGameData.UnlockedSkillIds.Contains(s.Id)))
+        {
+            <MudItem xs="12"><MudText>No talents discovered yet. Undertake quests and training to awaken them!</MudText></MudItem>
+        }
+    </MudGrid>
+</MudPaper>

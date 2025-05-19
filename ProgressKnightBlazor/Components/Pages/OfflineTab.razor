@@ -1,0 +1,27 @@
+﻿page "/offline-echoes"
+@inherits GameTabPageBase
+<MudPaper Class="pa-4" Elevation="0">
+    <MudText Typo="Typo.h4" GutterBottom="true">Echoes from the Void (Offline Progress)</MudText>
+    @if (GameState.OfflineProgressReport.Any())
+    {
+        <MudAlert Severity="Severity.Success" Class="mb-4">
+            <MudText Typo="Typo.h6" GutterBottom="true">While you were away, time flowed on...</MudText>@foreach (var reportLine in GameState.OfflineProgressReport)
+            {
+                <MudText Typo="Typo.body1">@reportLine</MudText>
+            }
+        </MudAlert> <MudButton Variant="Variant.Outlined" OnClick="ClearReport">Acknowledge the Echoes</MudButton>
+    }
+    else if (GameState.CurrentGameData.Settings.PauseOffline)
+    {
+        <MudAlert Severity="Severity.Info">The flow of time was held in stasis while you were absent, as per your decree. No offline progress was made. You can change this in the Scrolls of Configuration (Settings).</MudAlert>
+    }
+    else
+    {
+        <MudAlert Severity="Severity.Info">No significant offline period detected since your last communion with this realm, or offline progress is disabled. If you have just loaded your chronicle, any echoes should appear above.</MudAlert>
+    }
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="async () => await GameState.ProcessOfflineProgress()" Class="mt-3">Manually Check for Echoes</MudButton>
+    <MudText Typo="Typo.caption" Class="mt-2">Offline progress is calculated when loading the game if a significant time has passed since your last interaction or save. Max @(GameDataDefinitions.MaxOfflineTicksCap / 3600) hours of progress can be simulated.</MudText>
+</MudPaper>
+@code {
+    private void ClearReport() { GameState.OfflineProgressReport.Clear(); StateHasChanged(); }
+}

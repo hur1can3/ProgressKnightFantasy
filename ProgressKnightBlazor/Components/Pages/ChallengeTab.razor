@@ -1,0 +1,64 @@
+﻿@page "/trials"
+@inherits GameTabPageBase
+@using ProgressKnightFantasy.Components.Abstract
+@using ProgressKnightFantasy.Game.Models
+<MudPaper Class="pa-4" Elevation="0">
+    <MudText Typo="Typo.h4" GutterBottom="true">Trials of Ascendance</MudText>
+    <MudText Typo="Typo.subtitle1" Class="mb-4">Undertake arduous trials for unique boons and greater power upon rebirth. Only one trial can be active at a time.</MudText>
+    @if (!string.IsNullOrEmpty(GameState.CurrentGameData.CurrentChallengeId))
+    {
+        var activeChallenge = GameDataDefinitions.GetChallengeById(GameState.CurrentGameData.CurrentChallengeId); if (activeChallenge != null)
+        {
+            <MudAlert Severity="Severity.Info" Class="mb-3"><strong>Active Trial: @activeChallenge.Name</strong> - @activeChallenge.RestrictionDescription <MudButton Variant="Variant.Text" Color="Color.Error" Size="Size.Small" OnClick="GameState.AbandonChallenge" Class="ml-auto">Abandon Trial</MudButton></MudAlert>
+        }
+    }
+    <MudGrid Spacing="3">
+        @foreach (var challenge in GameState.AllChallenges.OrderBy(c => !c.IsUnlocked).ThenBy(c => GameState.GetChallengeCompletions(c.Id) >= c.MaxCompletions && c.MaxCompletions > 0).ThenBy(c => c.Name))
+        {
+            bool canStart = GameState.CanStartChallenge(challenge.Id); bool isActive = GameState.IsChallengeActive(challenge.Id); int completions = GameState.GetChallengeCompletions(challenge.Id); bool maxCompletionsReached = completions >= challenge.MaxCompletions && challenge.MaxCompletions > 0;
+            <MudItem xs="12" md="6">
+                <MudCard Elevation="isActive ? 4 : (challenge.IsUnlocked ? 2 : 1)" Style="@(challenge.IsUnlocked ? "" : "opacity:0.7;")">
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h6">@challenge.Name</MudText>@if (maxCompletionsReached)
+                            {
+                                <MudChip T="string" Size="Size.Small" Color="Color.Success">Mastered</MudChip>
+                            }
+                            else if (completions > 0)
+                            {
+                                <MudChip T="string" Size="Size.Small" Color="Color.Info">Completed @completions time(s)</MudChip>
+                            }
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudText Typo="Typo.body2">@challenge.Description</MudText>
+                        <MudText Typo="Typo.caption" Class="mt-1"><i>Restriction: @challenge.RestrictionDescription</i></MudText>
+                        <MudText Typo="Typo.caption" Color="Color.Primary" Class="mt-1">Active Bonus: +@((challenge.ActiveRewardFactor - 1.0) * 100)% Ancient Power</MudText>
+                        @if (!string.IsNullOrEmpty(challenge.FirstCompletionRewardDescription) && completions < 1)
+                        {
+                            <MudText Typo="Typo.caption" Color="Color.Secondary" Class="mt-1">First Completion: @challenge.FirstCompletionRewardDescription</MudText>
+                        }
+                        @if (!challenge.IsUnlocked)
+                        {
+                            <MudText Typo="Typo.caption" Color="Color.Warning" Class="mt-1">Locked.</MudText>
+                        }
+                    </MudCardContent>
+                    <MudCardActions>
+                        @if (isActive)
+                        {
+                            <MudButton Variant="Variant.Filled" Color="Color.Warning" OnClick="GameState.AbandonChallenge" FullWidth="true">Abandon Trial</MudButton>
+                        }
+                        else if (challenge.IsUnlocked && !maxCompletionsReached)
+                        {
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="() => GameState.StartChallenge(challenge.Id)" Disabled="!canStart" FullWidth="true">Begin Trial</MudButton>
+                        }
+                        else if (!challenge.IsUnlocked)
+                        {
+                            <MudChip T="string" Label="true" Color="Color.Default">Locked</MudChip>
+                        }
+                    </MudCardActions>
+                </MudCard>
+            </MudItem>
+        }
+    </MudGrid>
+</MudPaper>

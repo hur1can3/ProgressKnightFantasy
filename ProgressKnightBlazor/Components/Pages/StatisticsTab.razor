@@ -1,0 +1,44 @@
+﻿@page "/legends"
+@inherits GameTabPageBase
+@using ProgressKnightFantasy.Game.Models
+<MudPaper Class="pa-4" Elevation="0">
+    <MudText Typo="Typo.h4" GutterBottom="true">Legends & Chronicles (Statistics)</MudText>
+    <MudGrid Spacing="3">
+        <MudItem xs="12" md="6"><MudCard><MudCardHeader><CardHeaderContent><MudText Typo="Typo.h6">Current Age</MudText></CardHeaderContent></MudCardHeader><MudCardContent><MudSimpleTable Dense="true" Hover="true"><tbody><tr><td>Adventurer Level:</td><td>@GameState.CurrentGameData.CurrentRun.PlayerLevel.ToString("N0")</td></tr><tr><td>Time This Age:</td><td>@GameState.FormatTimeSpan(TimeSpan.FromSeconds(GameState.CurrentGameData.CurrentRun.TimeThisRun))</td></tr><tr><td>Silver Pieces:</td><td>@GameState.CurrentGameData.Coins.ToString("N2")</td></tr></tbody></MudSimpleTable></MudCardContent></MudCard></MudItem>
+        <MudItem xs="12" md="6"><MudCard><MudCardHeader><CardHeaderContent><MudText Typo="Typo.h6">Overall Legacy</MudText></CardHeaderContent></MudCardHeader><MudCardContent><MudSimpleTable Dense="true" Hover="true"><tbody><tr><td>Chronicle Started:</td><td>@GameState.CurrentGameData.Stats.StartDate.ToShortDateString()</td></tr><tr><td>Total Time Chronicled:</td><td>@GameState.FormatTimeSpan(TimeSpan.FromSeconds(GameState.CurrentGameData.TimePlayedTotal))</td></tr><tr><td>Ages Lived (Rebirths):</td><td>@GameState.CurrentGameData.Stats.TotalRebirths.ToString("N0")</td></tr><tr><td>Fastest Age:</td><td>@(GameState.CurrentGameData.Stats.FastestRebirthTime == double.MaxValue ? "N/A" : GameState.FormatTimeSpan(TimeSpan.FromSeconds(GameState.CurrentGameData.Stats.FastestRebirthTime)))</td></tr><tr><td>Highest Adventurer Level:</td><td>@GameState.CurrentGameData.Stats.MaxPlayerLevelAchieved.ToString("N0")</td></tr><tr><td>Total Silver Earned:</td><td>@GameState.CurrentGameData.Stats.TotalCoinsEarned.ToString("N0")</td></tr><tr><td>Total Ancient Power Acquired:</td><td>@GameState.CurrentGameData.Stats.TotalEvilEarned.ToString("N0")</td></tr><tr><td>Total Foes Vanquished:</td><td>@GameState.CurrentGameData.Stats.TotalEnemiesVanquished.ToString("N0")</td></tr></tbody></MudSimpleTable></MudCardContent></MudCard></MudItem>
+        <MudItem xs="12">
+            <MudText Typo="Typo.h6" Class="mt-4">Professions Mastered (Highest Rank)</MudText><MudSimpleTable Dense="true" Hover="true">
+                <thead><tr><th>Profession</th><th>Highest Rank</th></tr></thead>
+                <tbody>
+                    @foreach (var jobDef in GameState.AllJobs.OrderBy(j => j.Name))
+                    {
+                        if (GameState.CurrentGameData.Stats.HighestJobLevelAchieved.TryGetValue(jobDef.Id, out var level) && level > 0)
+                        {
+                            <tr><td>@jobDef.Name</td><td>@level</td></tr>
+                        }
+                    }@if (!GameState.CurrentGameData.Stats.HighestJobLevelAchieved.Any(kv => kv.Value > 0))
+                    {
+                        <tr><td colspan="2">No professions advanced yet.</td></tr>
+                    }
+                </tbody>
+            </MudSimpleTable>
+        </MudItem>
+        <MudItem xs="12">
+            <MudText Typo="Typo.h6" Class="mt-4">Foes Vanquished by Type</MudText><MudSimpleTable Dense="true" Hover="true">
+                <thead><tr><th>Creature</th><th>Count</th></tr></thead>
+                <tbody>
+                    @foreach (var enemyStat in GameState.CurrentGameData.Stats.EnemiesVanquishedByType.OrderByDescending(kv => kv.Value))
+                    {
+                        var enemyDef = GameDataDefinitions.GetEnemyById(enemyStat.Key); if (enemyDef != null)
+                        {
+                            <tr><td>@enemyDef.Name</td><td>@enemyStat.Value</td></tr>
+                        }
+                    }@if (!GameState.CurrentGameData.Stats.EnemiesVanquishedByType.Any())
+                    {
+                        <tr><td colspan="2">No specific creature types recorded yet.</td></tr>
+                    }
+                </tbody>
+            </MudSimpleTable>
+        </MudItem>
+    </MudGrid>
+</MudPaper>

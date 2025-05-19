@@ -1,0 +1,62 @@
+﻿@page "/rebirth"
+@inherits GameTabPageBase
+@inject IDialogService DialogService
+@using ProgressKnightFantasy.Game.Models
+<MudPaper Class="pa-4" Elevation="0">
+    <MudText Typo="Typo.h4" GutterBottom="true">The Cycle of Ages (Rebirth)</MudText>
+    <MudText Typo="Typo.subtitle1" Class="mb-4">Let go of this life to weave your accumulated power into the next. (Gains 'Ancient Power')</MudText>
+    <MudGrid>
+        <MudItem xs="12" md="6">
+            <MudPaper Class="pa-3" Elevation="2">
+                <MudText Typo="Typo.h6">Current Age Stats</MudText>
+                <MudText>Adventurer Level: @GameState.CurrentGameData.CurrentRun.PlayerLevel.ToString("N0")</MudText>
+                <MudText>Time This Age: @GameState.FormatTimeSpan(TimeSpan.FromSeconds(GameState.CurrentGameData.CurrentRun.TimeThisRun))</MudText>
+                <MudDivider Class="my-2" />
+                <MudText Typo="Typo.h6" Color="Color.Primary">Upon Rebirth:</MudText>
+                <MudText>You will gain: <MudChip T="string" T="string" Label="true" Color="Color.Error">@($"{GameState.CalculateEvilOnRebirth():N0} Ancient Power")</MudChip></MudText>
+                <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="HandleRebirth" Disabled="!GameState.CanRebirth()" FullWidth="true" Class="mt-3">Begin Anew</MudButton>
+                @if (!GameState.CanRebirth())
+                {
+                    <MudText Typo="Typo.caption" Color="Color.Warning" Class="mt-1">Reach Adventurer Level @GameDataDefinitions.MinPlayerLevelForRebirth to embrace a new age.</MudText>
+                }
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudPaper Class="pa-3" Elevation="2">
+                <MudText Typo="Typo.h6">Legacy</MudText>
+                <MudText>Total Ancient Power: <MudChip T="string" T="string" Label="true" Color="Color.Secondary">@GameState.CurrentGameData.Evil.ToString("N0")</MudChip></MudText>
+                <MudText>Ages Lived: @GameState.CurrentGameData.Stats.TotalRebirths.ToString("N0")</MudText>
+                <MudText>Fastest Age: @(GameState.CurrentGameData.Stats.FastestRebirthTime == double.MaxValue ? "N/A" : GameState.FormatTimeSpan(TimeSpan.FromSeconds(GameState.CurrentGameData.Stats.FastestRebirthTime)))</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12"><MudText Typo="Typo.h5" Class="mt-6 mb-3">Echoes of Power (Perks)</MudText></MudItem>
+        @foreach (var perk in GameState.AllEvilPerks.OrderBy(p => GameState.GetEvilPerkLevel(p.Id) >= p.MaxLevel).ThenBy(p => p.Name))
+        {
+            int currentLevel = GameState.GetEvilPerkLevel(perk.Id); double cost = currentLevel < perk.MaxLevel ? perk.CostFormula(currentLevel) : 0; bool canBuy = GameState.CanBuyEvilPerk(perk.Id);
+            <MudItem xs="12" sm="6" md="4">
+                <MudCard Elevation="2" Style="@(perk.IsUnlockedByDefault || GameState.IsPerkUnlockedByChallenge(perk.Id) ? "" : "display:none;")">
+                    <MudCardHeader><CardHeaderContent><MudText Typo="Typo.h6">@perk.Name</MudText><MudText Typo="Typo.caption">Rank: @currentLevel / @perk.MaxLevel</MudText></CardHeaderContent></MudCardHeader>
+                    <MudCardContent>
+                        <MudText Typo="Typo.body2">@perk.GetDescription(currentLevel)</MudText> @if (currentLevel < perk.MaxLevel)
+                        {
+                            <MudText Typo="Typo.body2" Class="mt-1"><i>@perk.GetNextLevelDescription(currentLevel)</i></MudText> <MudText Typo="Typo.subtitle2" Class="mt-1">Cost: <MudChip T="string" T="string" Label="true" Size="Size.Small" Color="Color.Error">@($"{cost:N0} Ancient Power")</MudChip></MudText>
+                        }
+                    </MudCardContent>
+                    <MudCardActions>
+                        @if (currentLevel < perk.MaxLevel)
+                        {
+                            <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="() => GameState.BuyEvilPerk(perk.Id)" Disabled="!canBuy">Attune Power</MudButton>
+                        }
+                        else
+                        {
+                            <MudChip T="string" T="string" Label="true" Color="Color.Success">Fully Attuned</MudChip>
+                        }
+                    </MudCardActions>
+                </MudCard>
+            </MudItem>
+        }
+    </MudGrid>
+</MudPaper>
+@code {
+    private async Task HandleRebirth() { if (!GameState.CanRebirth()) return; bool? confirmRebirth = true; if (!GameState.CurrentGameData.Settings.RebirthSkipEvilConfirmation) { confirmRebirth = await DialogService.ShowMessageBox("Confirm Rebirth", $"Are you sure you wish to begin a new age? You will gain approx. {GameState.CalculateEvilOnRebirth().ToString("N0")} Ancient Power. Your current life's progress will be woven into the echoes of time.", yesText: "Embrace the Cycle!", cancelText: "Not Yet"); } if (confirmRebirth == true) GameState.PerformRebirth(); }
+}

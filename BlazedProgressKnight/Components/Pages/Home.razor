@@ -1,0 +1,202 @@
+﻿@page "/"
+@using BlazedProgressKnight.Game
+
+@inject GameService Game
+@implements IDisposable
+@inject ILogger<Index> Logger
+
+<PageTitle>Blazor Progress Knight - Original CSS</PageTitle>
+
+<div class="container">
+    <header class="mb-3">
+        <h1 style="text-align: center; color: var(--text-color, #333);">Blazor Progress Knight</h1>
+    </header>
+
+    <div class="section player-stats mb-3">
+        <h2 style="margin-bottom: 10px;">Player Status</h2>
+        <div style="display: flex; flex-wrap: wrap; gap: 15px; font-size: 0.9em;">
+            <span>Money: <strong id="moneyVal">@Game.State.Money.ToString("F2")</strong></span>
+            <span>Job: <strong id="currentJobVal">@Game.State.CurrentJobDisplayName</strong></span>
+            @if (!string.IsNullOrEmpty(Game.State.CurrentActionName) && Game.State.CurrentActionName != "Idle")
+            {
+                <span>Income: <strong id="incomeVal">@Game.State.MoneyPerSecondEquivalent.ToString("F2")/s</strong></span>
+            }
+            <span>Strength: <strong id="strengthVal">@Game.State.Strength.ToString("F0")</strong></span>
+            <span>Intelligence: <strong id="intelligenceVal">@Game.State.Intelligence.ToString("F0")</strong></span>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Game.State.CurrentActionName) && Game.State.CurrentActionName != "Idle")
+    {
+        <div class="section current-action-progress mb-3">
+            <h3>@Game.State.CurrentActionName</h3>
+            <div class="progress-bar-container">
+                <div class="progress-bar" style="width: @(Game.State.CurrentActionProgress.ToString("F0"))%;">
+                </div>
+                <div class="progress-bar-text">@(Game.State.CurrentActionProgress.ToString("F0"))%</div>
+            </div>
+            <p style="text-align:center; font-size:0.8em; margin-top:5px;">
+                @Game.State.CurrentActionTimeElapsed.ToString("F1")s / @Game.State.CurrentActionDuration.ToString("F1")s
+            </p>
+        </div>
+    }
+
+    <div class="tabs">
+        <button class="tab-button @(ActiveTab == "jobs" ? "active" : "")" @onclick="() => ShowTab(JobsTab)">Jobs</button>
+        <button class="tab-button @(ActiveTab == "skills" ? "active" : "")" @onclick="() => ShowTab(SkillsTab)">Skills</button>
+        <button class="tab-button @(ActiveTab == "shop" ? "active" : "")" @onclick="() => ShowTab(ShopTab)" disabled>Shop (NYI)</button>
+        <button class="tab-button @(ActiveTab == "misc" ? "active" : "")" @onclick="() => ShowTab(MiscTab)" disabled>Misc (NYI)</button>
+    </div>
+
+    <div id="tab-content-container">
+        @if (ActiveTab == "jobs")
+        {
+            <div id="jobs" class="tab-content active">
+                <h2>Available Jobs</h2>
+                <div class="item-list">
+                    @foreach (var jobEntry in GameData.AllJobs.Values.OrderBy(j => j.Category).ThenBy(j => j.BaseIncome))
+                    {
+                        var jobDef = jobEntry;
+                        bool requirementsMet = Game.AreRequirementsMet(jobDef.Requirements);
+                        bool isCurrentJob = Game.State.CurrentJobInternalName == jobDef.InternalName;
+
+                        <div class="item @(isCurrentJob ? "active-item" : "") @(!requirementsMet ? "locked-item" : "")">
+                            <div class="item-details">
+                                <h4>@jobDef.DisplayName @(Game.State.PlayerJobLevels.TryGetValue(jobDef.InternalName, out int jl) && jl > 0 ? $"(Lvl: {jl})" : "")</h4>
+                                <p>Category: @jobDef.Category</p>
+                                <p>Income: @jobDef.BaseIncome.ToString("F0")/cycle | XP: @jobDef.BaseExperience.ToString("F0")/cycle</p>
+                                @if (!requirementsMet && jobDef.Requirements.Any())
+                                {
+                                    <p class="requirements">
+                                        Requires:
+                                        @foreach (var req in jobDef.Requirements)
+                                        {
+                                            <span>@req.Name @req.Value; </span>
+                                        }
+                                    </p>
+                                }
+                            </div>
+                            <div class="item-action">
+                                @if (isCurrentJob)
+                                {
+                                    <button class="button-small" disabled>Active</button>
+                                }
+                                else
+                                {
+                                    <button class="button-small" @onclick='() => Game.AssignJob(jobDef.InternalName)' disabled="!requirementsMet">
+                                        Work
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+                @if (Game.State.CurrentJobInternalName != "Unemployed")
+                {
+                    <button @onclick='() => Game.AssignJob("Unemployed")' class="button-secondary" style="width:100%; margin-top:15px;">
+                        Quit Current Job
+                    </button>
+                }
+            </div>
+        }
+
+        @if (ActiveTab == "skills")
+        {
+            <div id="skills" class="tab-content active">
+                <h2>Available Skills</h2>
+                <div class="item-list">
+                    @foreach (var skillEntry in GameData.AllSkills.Values.OrderBy(s => s.Category).ThenBy(s => s.BaseCost))
+                    {
+                        var skillDef = skillEntry;
+                        int currentLevel = Game.State.PlayerSkillLevels.TryGetValue(skillDef.InternalName, out int lvl) ? lvl : 0;
+                        double currentXP = Game.State.PlayerSkillExperience.TryGetValue(skillDef.InternalName, out double xp) ? xp : 0;
+                        double xpToNextLevel = skillDef.GetXpForNextLevel(currentLevel);
+                        double costToTrain = skillDef.GetCostForLevel(currentLevel + 1);
+                        bool canAfford = Game.State.Money >= costToTrain;
+                        bool maxLevelReached = currentLevel >= skillDef.MaxLevel;
+                        bool requirementsMetForUnlock = Game.AreRequirementsMet(skillDef.RequirementsToUnlock);
+
+                        <div class="item @(!requirementsMetForUnlock ? "locked-item" : "")">
+                            <div class="item-details">
+                                <h4>@skillDef.DisplayName (Lvl: @currentLevel / @skillDef.MaxLevel)</h4>
+                                <p>Category: @skillDef.Category</p>
+                                @if (currentLevel < skillDef.MaxLevel && requirementsMetForUnlock)
+                                {
+                                    <div class="progress-bar-container" style="height:15px; margin-top:3px; margin-bottom:3px;">
+                                        <div class="progress-bar" style="width: @((xpToNextLevel > 0 ? (currentXP/xpToNextLevel*100) : 0).ToString("F0"))%; height:15px; line-height:15px; font-size:10px;">
+                                            @((xpToNextLevel > 0 ? (currentXP / xpToNextLevel * 100) : 0).ToString("F0"))%
+                                        </div>
+                                    </div>
+                                    <p>XP: @currentXP.ToString("F0") / @xpToNextLevel.ToString("F0")</p>
+                                }
+                                @if (!requirementsMetForUnlock && skillDef.RequirementsToUnlock.Any())
+                                {
+                                    <p class="requirements">
+                                        Requires:
+                                        @foreach (var req in skillDef.RequirementsToUnlock)
+                                        {
+                                            <span>@req.Name @req.Value; </span>
+                                        }
+                                    </p>
+                                }
+                                @if (skillDef.EffectsPerLevel.Any())
+                                {
+                                    <p class="effects">
+                                        Effects:
+                                        @foreach (var effect in skillDef.EffectsPerLevel.Take(1))
+                                        {
+                                            <span>+@((effect.Value * 100).ToString("F0"))% @effect.Type to @(string.IsNullOrEmpty(effect.TargetInternalName) ? "All" : effect.TargetInternalName); </span>
+                                        }
+                                    </p>
+                                }
+                            </div>
+                            <div class="item-action">
+                                @if (requirementsMetForUnlock && !maxLevelReached)
+                                {
+                                    <button class="button-small" @onclick='() => Game.TrainSkill(skillDef.InternalName)' disabled="!canAfford">
+                                        Train (@costToTrain.ToString("F0"))
+                                    </button>
+                                }
+                                else if (maxLevelReached)
+                                {
+                                    <button class="button-small" disabled>Max</button>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        @* Add other tabs (Shop, Misc) here when ready *@
+    </div>
+
+    <footer class="mt-4" style="text-align:center; padding: 10px; font-size: 0.8em;">
+        <button @onclick="ResetGame" class="button-danger">Reset Game</button>
+    </footer>
+</div>
+
+@code {
+    private string ActiveTab = "jobs"; // Default active tab
+    private string JobsTab = "jobs";
+    private string SkillsTab = "skills";
+    private string ShopTab = "shop";
+    private string MiscTab = "misc";
+
+    protected override void OnInitialized()
+    {
+        Logger.LogInformation("Index page initialized with Original CSS structure.");
+        Game.OnStateChange += HandleStateChange;
+        Game.StartGameLoop();
+    }
+
+    private void ShowTab(string tabId)
+    {
+        ActiveTab = tabId;
+        Logger.LogInformation($"Switched to tab: {tabId}");
+        // StateHasChanged(); // Not strictly necessary if only activeTab changes and UI re-renders based on it.
+    }
+
+    private async void HandleStateChange() => await InvokeAsync(StateHasChanged);
+    private void ResetGame() => Game.ResetGame();
+    public void Dispose() => Game.OnStateChange -= HandleStateChange;
+}

@@ -1,0 +1,17 @@
+﻿@page "/settings"
+@inherits GameTabPageBase
+<MudPaper Class="pa-4" Elevation="0">
+    <MudText Typo="Typo.h4" GutterBottom="true">Scrolls of Configuration</MudText>
+    <MudGrid Spacing="3">
+        <MudItem xs="12" md="6"><MudCard><MudCardHeader><CardHeaderContent><MudText Typo="Typo.h6">Gameplay</MudText></CardHeaderContent></MudCardHeader><MudCardContent><MudCheckBox T="bool" @bind-Checked="@GameState.CurrentGameData.Settings.AutoRebirth" Label="Auto-Rebirth at Target Level" Color="Color.Primary"></MudCheckBox>@if (GameState.CurrentGameData.Settings.AutoRebirth)
+                    {
+                        <MudNumericField @bind-Value="@GameState.CurrentGameData.Settings.AutoRebirthLevel" Label="Auto-Rebirth Adventurer Level" Variant="Variant.Text" Min="10" Step="10" />
+                    }<MudCheckBox T="bool" @bind-Checked="@GameState.CurrentGameData.Settings.RebirthSkipEvilConfirmation" Label="Skip Rebirth Confirmation" Color="Color.Primary"></MudCheckBox><MudCheckBox T="bool" @bind-Checked="@GameState.CurrentGameData.Settings.AutoPromote" Label="Auto-Promote in Professions" Color="Color.Primary"></MudCheckBox></MudCardContent></MudCard></MudItem>
+        <MudItem xs="12" md="6"><MudCard><MudCardHeader><CardHeaderContent><MudText Typo="Typo.h6">Interface & Visuals</MudText></CardHeaderContent></MudCardHeader><MudCardContent><MudSelect T="string" @bind-Value="@GameState.CurrentGameData.Settings.SelectedTheme" Label="Visual Theme" Variant="Variant.Text"><MudSelectItem T="string" Value="@("dark_fantasy")">Dark Fantasy</MudSelectItem><MudSelectItem T="string" Value="@("light_scroll")">Light Scroll</MudSelectItem><MudSelectItem T="string" Value="@("ancient_library")">Ancient Library</MudSelectItem></MudSelect><MudSelect T="string" @bind-Value="@GameState.CurrentGameData.Settings.SelectedFont" Label="Font Style" Variant="Variant.Text" Class="mt-3"><MudSelectItem T="string" Value="@("Medieval")">Medieval</MudSelectItem><MudSelectItem T="string" Value="@("Elvish_Script")">Elvish Script (Decorative)</MudSelectItem><MudSelectItem T="string" Value="@("Standard_Readable")">Standard Readable</MudSelectItem></MudSelect><MudCheckBox T="bool" @bind-Checked="@GameState.CurrentGameData.Settings.ShowDamageNumbers" Label="Show Combat Damage Numbers" Color="Color.Primary" Class="mt-3"></MudCheckBox></MudCardContent></MudCard></MudItem>
+        <MudItem xs="12" md="6"><MudCard><MudCardHeader><CardHeaderContent><MudText Typo="Typo.h6">Offline Behavior</MudText></CardHeaderContent></MudCardHeader><MudCardContent><MudCheckBox T="bool" @bind-Checked="@GameState.CurrentGameData.Settings.PauseOffline" Label="Pause Progress While Away" Color="Color.Primary"></MudCheckBox><MudText Typo="Typo.caption">If unchecked, the game will calculate progress for up to @(GameDataDefinitions.MaxOfflineTicksCap / 3600) hours while you were gone.</MudText></MudCardContent></MudCard></MudItem>
+    </MudGrid>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SaveChanges" Class="mt-4">Commit Changes to the Archives</MudButton>
+</MudPaper>
+@code {
+    private void SaveChanges() { GameState.NotifyStateChanged(); Console.WriteLine("Settings updated (changes are live-bound)."); }
+}

@@ -1,0 +1,53 @@
+﻿@inherits LayoutComponentBase
+@using ProgressKnightFantasy.Components.Pages 
+
+@* Required *@
+<MudThemeProvider />
+<MudPopoverProvider />
+
+@* Needed for dialogs *@
+<MudDialogProvider />
+
+@* Needed for snackbars *@
+<MudSnackbarProvider />
+<MudLayout>
+    <MudAppBar Elevation="1">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        <MudText Typo="Typo.h5" Class="ml-3">Echoes of Arda</MudText>
+        <MudSpacer />
+        <MudIconButton Icon="@Icons.Material.Filled.Brightness4" Color="Color.Inherit" OnClick="@ToggleDarkMode" />
+    </MudAppBar>
+
+    <MudDrawer @bind-Open="_drawerOpen" Elevation="1">
+        <MudDrawerHeader>
+            <MudText Typo="Typo.h6">Chronicles</MudText>
+        </MudDrawerHeader>
+        <NavMenu />
+    </MudDrawer>
+
+    <MudMainContent Class="pt-16 px-4">
+        <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="my-4">
+            <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-0">
+                <MudTabPanel Text="Quests & Training"><StoryTab /></MudTabPanel>
+                <MudTabPanel Text="Professions"><WorkTab /></MudTabPanel>
+                <MudTabPanel Text="Talents"><SkillsTab /></MudTabPanel>
+                <MudTabPanel Text="Market"><ShopTab /></MudTabPanel>
+                <MudTabPanel Text="Battlegrounds"><CombatTab /></MudTabPanel>
+                <MudTabPanel Text="Rebirth"><RebirthTab /></MudTabPanel>
+                <MudTabPanel Text="Trials"><ChallengeTab /></MudTabPanel>
+                <MudTabPanel Text="Lore & Automation"><AutomationTab /></MudTabPanel>
+                <MudTabPanel Text="Chronicle"><SaveTab /></MudTabPanel>
+                <MudTabPanel Text="Settings"><SettingsTab /></MudTabPanel>
+                <MudTabPanel Text="Offline Echoes"><OfflineTab /></MudTabPanel>
+                <MudTabPanel Text="Legends"><StatisticsTab /></MudTabPanel>
+                <MudTabPanel Text="Guidance"><HelpTab /></MudTabPanel>
+            </MudTabs>
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    private bool _drawerOpen = true;
+    void DrawerToggle() => _drawerOpen = !_drawerOpen;
+    private void ToggleDarkMode() => Console.WriteLine("Dark mode toggle clicked. Theme switching not yet implemented.");
+}
