@@ -10,6 +10,7 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddMudServices();
 builder.Services.AddScoped<GameStateService>();
+builder.Services.AddScoped<ThemeService>();    // Add ThemeService as Scoped
 
 var app = builder.Build();
 

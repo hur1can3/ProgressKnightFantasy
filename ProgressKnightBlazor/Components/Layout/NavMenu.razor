@@ -1,33 +1,18 @@
-﻿<MudNavMenu>
-    <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
-   
-    <MudNavLink Href="quests" Icon="@Icons.Material.Filled.Book">Quests & Training</MudNavLink>
-    <MudNavLink Href="professions" Icon="@Icons.Material.Filled.Work">Professions</MudNavLink> 
-    <MudNavLink Href="talents" Icon="@Icons.Material.Filled.Book">Talents</MudNavLink>
-    <MudNavLink Href="market" Icon="@Icons.Material.Filled.Store">Market</MudNavLink>
-    <MudNavLink Href="battlegrounds" Icon="@Icons.Material.Filled.Work">Battlegrounds</MudNavLink>
-    <MudNavLink Href="rebirth" Icon="@Icons.Material.Filled.Warning">Rebirth</MudNavLink>
-    <MudNavLink Href="trials" Icon="@Icons.Material.Filled.Work">Talents</MudNavLink>
-    <MudNavLink Href="lore-automation" Icon="@Icons.Material.Filled.Work">Lore & Automation</MudNavLink>
-    <MudNavLink Href="chronicle" Icon="@Icons.Material.Filled.Work">Chronicle</MudNavLink>
-    <MudNavLink Href="settings" Icon="@Icons.Material.Filled.Work">Settings</MudNavLink>
-    <MudNavLink Href="offline-echoes" Icon="@Icons.Material.Filled.Work">Offline Echoes</MudNavLink>
-    <MudNavLink Href="legends" Icon="@Icons.Material.Filled.Work">Legends</MudNavLink>
-    <MudNavLink Href="guidance" Icon="@Icons.Material.Filled.Work">Guidance</MudNavLink>
-
-
-    @* 
-                    <MudTabPanel Text="Quests & Training"><StoryTab /></MudTabPanel>
-                <MudTabPanel Text="Professions"><WorkTab /></MudTabPanel>
-                <MudTabPanel Text="Talents"><SkillsTab /></MudTabPanel>
-                <MudTabPanel Text="Market"><ShopTab /></MudTabPanel>
-                <MudTabPanel Text="Battlegrounds"><CombatTab /></MudTabPanel>
-                <MudTabPanel Text="Rebirth"><RebirthTab /></MudTabPanel>
-                <MudTabPanel Text="Trials"><ChallengeTab /></MudTabPanel>
-                <MudTabPanel Text="Lore & Automation"><AutomationTab /></MudTabPanel>
-                <MudTabPanel Text="Chronicle"><SaveTab /></MudTabPanel>
-                <MudTabPanel Text="Settings"><SettingsTab /></MudTabPanel>
-                <MudTabPanel Text="Offline Echoes"><OfflineTab /></MudTabPanel>
-                <MudTabPanel Text="Legends"><StatisticsTab /></MudTabPanel>
-                <MudTabPanel Text="Guidance"><HelpTab /></MudTabPanel> *@
+﻿<MudNavMenu Class="pa-2">
+    <MudNavLink Href="quests" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.MenuBook">Quests & Training</MudNavLink>
+    <MudNavLink Href="professions" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.WorkOutline">Professions</MudNavLink>
+    <MudNavLink Href="talents" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.StarOutline">Talents</MudNavLink>
+    <MudNavLink Href="market" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Storefront">Market</MudNavLink>
+    <MudNavLink Href="battlegrounds" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.SportsKabaddi">Battlegrounds</MudNavLink>
+    <MudDivider Class="my-2" />
+    <MudNavLink Href="rebirth" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Autorenew">Rebirth</MudNavLink>
+    <MudNavLink Href="trials" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.VerifiedUser">Trials</MudNavLink>
+    <MudDivider Class="my-2" />
+    <MudNavLink Href="lore-automation" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AutoStories">Lore & Automation</MudNavLink>
+    <MudNavLink Href="legends" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.EmojiEvents">Legends</MudNavLink>
+    <MudDivider Class="my-2" />
+    <MudNavLink Href="chronicle" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Save">Chronicle (Save/Load)</MudNavLink>
+    <MudNavLink Href="settings" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Settings">Settings</MudNavLink>
+    <MudNavLink Href="offline-echoes" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.HourglassBottom">Offline Echoes</MudNavLink>
+    <MudNavLink Href="guidance" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.HelpOutline">Guidance</MudNavLink>
 </MudNavMenu>

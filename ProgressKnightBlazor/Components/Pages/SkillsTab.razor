@@ -1,23 +1,24 @@
 ﻿@page "/talents"
 @inherits GameTabPageBase
-@using ProgressKnightFantasy.Components.Abstract
 @using ProgressKnightFantasy.Game.Models
-
-<MudPaper Class="pa-4" Elevation="0">
+<MudPaper Class="pa-2" Elevation="0">
     <MudText Typo="Typo.h4" GutterBottom="true">Talents & Abilities</MudText>
-    <MudText Typo="Typo.subtitle1" Class="mb-4">Hone your innate talents and learned abilities. These are permanent and persist through Rebirth.</MudText>
-    <MudGrid Spacing="3">
+    <MudText Typo="Typo.subtitle1" Class="mb-3">Hone your innate talents and learned abilities. These are permanent and persist through Rebirth.</MudText>
+    <MudGrid Spacing="2">
         @foreach (var skill in GameState.AllSkills.OrderBy(s => !GameState.CurrentGameData.UnlockedSkillIds.Contains(s.Id)).ThenBy(s => s.Category).ThenBy(s => s.Name))
         {
             bool isUnlocked = GameState.CurrentGameData.UnlockedSkillIds.Contains(skill.Id);
+            string unlockedOpacity = isUnlocked ? "" : "opacity: 0.65;";
+            string classStyle = $"border-left: 4px solid {skill.ThemeColor}; {unlockedOpacity}";
+
             <MudItem xs="12" sm="6" md="4">
-                <MudCard Elevation="isUnlocked ? 2 : 1" Style="@(isUnlocked ? "" : "opacity: 0.65;")">
-                    <MudCardHeader><CardHeaderContent><MudText Typo="Typo.h6">@skill.Name</MudText><MudText Typo="Typo.caption">Category: @skill.Category</MudText></CardHeaderContent></MudCardHeader>
-                    <MudCardContent>
-                        <MudText Typo="Typo.body2">@skill.Description</MudText>
+                <MudCard Elevation="isUnlocked ? 1 : 0" Style="classStyle" Class="mb-2">
+                    <MudCardHeader Class="pa-2"><CardHeaderContent><MudText Typo="Typo.h6">@skill.Name</MudText><MudText Typo="Typo.caption">Category: @skill.Category</MudText></CardHeaderContent></MudCardHeader>
+                    <MudCardContent Class="pa-2">
+                        <MudText Typo="Typo.body2" Class="mb-1">@skill.Description</MudText>
                         @if (isUnlocked)
                         {
-                            <MudText Typo="Typo.h5" Class="mt-2">Level: @GameState.GetSkillLevel(skill.Id).ToString("N1")</MudText>
+                            <MudText Typo="Typo.h5" Class="mt-1">Level: @GameState.GetSkillLevel(skill.Id).ToString("N1")</MudText>
                             <MudText Typo="Typo.caption"><i>Effect: @skill.EffectDescription</i></MudText>
                         }
                         else

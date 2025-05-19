@@ -1,10 +1,8 @@
 ﻿@page "/quests"
 @inherits GameTabPageBase
-@using ProgressKnightFantasy.Components.Abstract
 @using ProgressKnightFantasy.Game.Models
 
-
-<MudPaper Class="pa-4" Elevation="0">
+<MudPaper Class="pa-2" Elevation="0">
     <MudText Typo="Typo.h4" GutterBottom="true">Your Saga Begins</MudText>
     <MudText Typo="Typo.subtitle1" Class="mb-1">Adventurer Level: @GameState.CurrentGameData.CurrentRun.PlayerLevel.ToString("N0") (XP: @GameState.CurrentGameData.CurrentRun.PlayerXp.ToString("N1") / @GameDataDefinitions.CalculatePlayerXpForNextLevel(GameState.CurrentGameData.CurrentRun.PlayerLevel).ToString("N0"))</MudText>
 
@@ -13,7 +11,7 @@
         var jobDef = GameState.GetJobDefinitionById(GameState.CurrentGameData.CurrentJobId);
         if (jobDef != null)
         {
-            <MudText Typo="Typo.body2" Class="mb-3">Current Profession: @jobDef.Name (Rank @GameState.GetJobLevel(jobDef.Id))</MudText>
+            <MudText Typo="Typo.body2" Class="mb-2">Current Profession: @jobDef.Name (Rank @GameState.GetJobLevel(jobDef.Id))</MudText>
         }
     }
     else if (!string.IsNullOrEmpty(GameState.CurrentGameData.CurrentTaskName))
@@ -21,7 +19,7 @@
         var taskDef = GameState.GetTaskDefinitionById(GameState.CurrentGameData.CurrentTaskName);
         if (taskDef != null)
         {
-            <MudText Typo="Typo.body2" Class="mb-3">Current Activity: @taskDef.Name (Lvl @GameState.GetTaskLevel(taskDef.Id))</MudText>
+            <MudText Typo="Typo.body2" Class="mb-2">Current Activity: @taskDef.Name (Lvl @GameState.GetTaskLevel(taskDef.Id))</MudText>
         }
     }
     else if (!string.IsNullOrEmpty(GameState.CurrentGameData.CurrentEnemyId))
@@ -29,43 +27,43 @@
         var enemyDef = GameDataDefinitions.GetEnemyById(GameState.CurrentGameData.CurrentEnemyId);
         if (enemyDef != null)
         {
-            <MudText Typo="Typo.body2" Color="Color.Error" Class="mb-3">In Combat With: @enemyDef.Name</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Error" Class="mb-2">In Combat With: @enemyDef.Name</MudText>
         }
     }
     else
     {
-        <MudText Typo="Typo.body2" Class="mb-3">Awaiting your command, adventurer.</MudText>
+        <MudText Typo="Typo.body2" Class="mb-2">Awaiting your command, adventurer.</MudText>
     }
 
-    <MudGrid Spacing="3">
+    <MudGrid Spacing="2">
         <MudItem xs="12" sm="6" md="4">
-            <MudPaper Class="pa-3" Elevation="2">
+            <MudPaper Class="pa-2" Elevation="1">
                 <MudText Typo="Typo.h6">Realm Status</MudText>
-                <MudText>Days Passed: @GameState.CurrentGameData.Days.ToString("N0")</MudText>
-                <MudText>Silver Pieces: @GameState.CurrentGameData.Coins.ToString("N2")</MudText>
-                <MudText>Time This Age: @GameState.FormatTimeSpan(TimeSpan.FromSeconds(GameState.CurrentGameData.CurrentRun.TimeThisRun))</MudText>
-                <MudText>Total Time Chronicled: @GameState.FormatTimeSpan(TimeSpan.FromSeconds(GameState.CurrentGameData.TimePlayedTotal))</MudText>
-                <MudText>Paused: @GameState.CurrentGameData.Paused</MudText>
-                <MudButton Variant="Variant.Filled" Color="GameState.CurrentGameData.Paused ? Color.Success : Color.Warning" OnClick="GameState.TogglePause" FullWidth="true" Class="mt-2">
+                <MudText Typo="Typo.body2">Days Passed: @GameState.CurrentGameData.Days.ToString("N0")</MudText>
+                <MudText Typo="Typo.body2">Silver Pieces: @GameState.CurrentGameData.Coins.ToString("N2")</MudText>
+                <MudText Typo="Typo.body2">Time This Age: @GameState.FormatTimeSpan(TimeSpan.FromSeconds(GameState.CurrentGameData.CurrentRun.TimeThisRun))</MudText>
+                <MudText Typo="Typo.caption">Total Time Chronicled: @GameState.FormatTimeSpan(TimeSpan.FromSeconds(GameState.CurrentGameData.TimePlayedTotal))</MudText>
+                <MudText Typo="Typo.body2">Paused: @GameState.CurrentGameData.Paused</MudText>
+                <MudButton Variant="Variant.Filled" Color="GameState.CurrentGameData.Paused ? Color.Success : Color.Warning" OnClick="GameState.TogglePause" FullWidth="true" Class="mt-2" Size="Size.Small">
                     @(GameState.CurrentGameData.Paused ? "Resume Chronicle" : "Pause Chronicle")
                 </MudButton>
             </MudPaper>
         </MudItem>
 
         <MudItem xs="12" sm="6" md="8">
-            <MudPaper Class="pa-3" Elevation="2" Style="min-height: 210px;">
+            <MudPaper Class="pa-2" Elevation="1" Style="min-height: 190px;">
                 <MudText Typo="Typo.h6">Current Focus</MudText>
                 @if (!string.IsNullOrEmpty(GameState.CurrentGameData.CurrentTaskName))
                 {
                     var currentTaskDef = GameState.GetTaskDefinitionById(GameState.CurrentGameData.CurrentTaskName);
                     if (currentTaskDef != null)
                     {
-                        <MudText>Undertaking: <strong>@currentTaskDef.Name</strong> (Lvl: @GameState.GetTaskLevel(currentTaskDef.Id))</MudText>
-                        <MudText Typo="Typo.body2">@currentTaskDef.Description</MudText>
-                        <MudProgressLinear Color="Color.Primary" Value="@GameState.GetTaskProgressPercent(currentTaskDef.Id)" Class="my-2">
-                            <MudText Typo="Typo.caption" Class="px-2">@GameState.GetTaskCurrentXp(currentTaskDef.Id).ToString("N1") / @GameState.CalculateXpForNextLevel(currentTaskDef, GameState.GetTaskLevel(currentTaskDef.Id)).ToString("N0") XP</MudText>
+                        <MudText Typo="Typo.subtitle1">Undertaking: <strong>@currentTaskDef.Name</strong> (Lvl: @GameState.GetTaskLevel(currentTaskDef.Id))</MudText>
+                        <MudText Typo="Typo.body2" Class="mb-1">@currentTaskDef.Description</MudText>
+                        <MudProgressLinear Color="@((MudBlazor.Color)Enum.Parse(typeof(MudBlazor.Color), currentTaskDef.ThemeColor.Split('.').Last(), true))" Value="@GameState.GetTaskProgressPercent(currentTaskDef.Id)" Class="my-1">
+                            <MudText Typo="Typo.caption" Class="px-1">@GameState.GetTaskCurrentXp(currentTaskDef.Id).ToString("N1") / @GameState.CalculateXpForNextLevel(currentTaskDef, GameState.GetTaskLevel(currentTaskDef.Id)).ToString("N0") XP</MudText>
                         </MudProgressLinear>
-                        <MudButton Variant="Variant.Outlined" OnClick='() => GameState.SetCurrentTask(null)' FullWidth="true">Cease Activity</MudButton>
+                        <MudButton Variant="Variant.Outlined" OnClick='() => GameState.SetCurrentTask(null)' FullWidth="true" Size="Size.Small">Cease Activity</MudButton>
                     }
                 }
                 else if (!string.IsNullOrEmpty(GameState.CurrentGameData.CurrentJobId))
@@ -73,12 +71,12 @@
                     var currentJobDef = GameState.GetJobDefinitionById(GameState.CurrentGameData.CurrentJobId);
                     if (currentJobDef != null)
                     {
-                        <MudText>Profession: <strong>@currentJobDef.Name</strong> (Rank: @GameState.GetJobLevel(currentJobDef.Id))</MudText>
-                        <MudText Typo="Typo.body2">@currentJobDef.Description</MudText>
-                        <MudProgressLinear Color="Color.Secondary" Value="@GameState.GetJobProgressPercent(currentJobDef.Id)" Class="my-2">
-                            <MudText Typo="Typo.caption" Class="px-2">@GameState.GetJobCurrentXp(currentJobDef.Id).ToString("N1") / @GameState.CalculateJobXpForNextLevel(currentJobDef, GameState.GetJobLevel(currentJobDef.Id)).ToString("N0") XP</MudText>
+                        <MudText Typo="Typo.subtitle1">Profession: <strong>@currentJobDef.Name</strong> (Rank: @GameState.GetJobLevel(currentJobDef.Id))</MudText>
+                        <MudText Typo="Typo.body2" Class="mb-1">@currentJobDef.Description</MudText>
+                        <MudProgressLinear Color="@((MudBlazor.Color)Enum.Parse(typeof(MudBlazor.Color), currentJobDef.ThemeColor.Split('.').Last(), true))" Value="@GameState.GetJobProgressPercent(currentJobDef.Id)" Class="my-1">
+                            <MudText Typo="Typo.caption" Class="px-1">@GameState.GetJobCurrentXp(currentJobDef.Id).ToString("N1") / @GameState.CalculateJobXpForNextLevel(currentJobDef, GameState.GetJobLevel(currentJobDef.Id)).ToString("N0") XP</MudText>
                         </MudProgressLinear>
-                        <MudButton Variant="Variant.Outlined" OnClick='() => GameState.StopJob()' FullWidth="true">Stop Profession</MudButton>
+                        <MudButton Variant="Variant.Outlined" OnClick='() => GameState.StopJob()' FullWidth="true" Size="Size.Small">Stop Profession</MudButton>
                     }
                 }
                 else if (!string.IsNullOrEmpty(GameState.CurrentGameData.CurrentEnemyId))
@@ -86,7 +84,7 @@
                     var enemyDef = GameDataDefinitions.GetEnemyById(GameState.CurrentGameData.CurrentEnemyId);
                     if (enemyDef != null)
                     {
-                        <MudAlert Severity="Severity.Warning">Engaged in battle with @enemyDef.Name!</MudAlert>
+                        <MudAlert Severity="Severity.Warning" Dense="true">Engaged in battle with @enemyDef.Name!</MudAlert>
                     }
                 }
                 else
@@ -96,20 +94,23 @@
             </MudPaper>
         </MudItem>
 
-        <MudItem xs="12"><MudText Typo="Typo.h5" Class="mt-4">Available Quests & Training Activities</MudText></MudItem>
+        <MudItem xs="12"><MudText Typo="Typo.h5" Class="mt-3 mb-1">Available Quests & Training Activities</MudText></MudItem>
         @foreach (var task in GameState.AllTasks.OrderBy(t => !GameState.IsTaskActuallyAvailable(t.Id)).ThenBy(t => t.Category).ThenBy(t => t.Name))
         {
             bool isAvailable = GameState.IsTaskActuallyAvailable(task.Id); bool isCurrent = GameState.CurrentGameData.CurrentTaskName == task.Id;
+            string taskThemeColor = task.ThemeColor.Split('.').Last().ToLower();
+            string availableOpacity = isAvailable ? "" : "opacity: 0.65;";
+            string classStyle = $"border-left: 4px solid var(--mud-palette-{taskThemeColor}); {availableOpacity}";
+
             <MudItem xs="12" sm="6" md="4">
-                <MudCard Elevation="isCurrent ? 4 : (isAvailable ? 2 : 1)" Style="@(isAvailable ? "" : "opacity: 0.65;")">
-                    <MudCardHeader><CardHeaderContent><MudText Typo="Typo.h6">@task.Name (Lvl: @GameState.GetTaskLevel(task.Id))</MudText><MudText Typo="Typo.caption">Category: @task.Category</MudText></CardHeaderContent></MudCardHeader>
-                    <MudCardContent>
-                        <MudText Typo="Typo.body2">@task.Description</MudText>
-                        <MudText Typo="Typo.body2" Class="mt-1">Activity XP/sec: @task.XpGainPerTick.ToString("N1")</MudText>
-                        <MudText Typo="Typo.body2">Adventurer XP/sec: @task.PlayerXpRewardPerTick.ToString("N1")</MudText>
+                <MudCard Elevation="isCurrent ? 3 : (isAvailable ? 1 : 0)" Style="classStyle" Class="mb-2">
+                    <MudCardHeader Class="pa-2"><CardHeaderContent><MudText Typo="Typo.h6">@task.Name (Lvl: @GameState.GetTaskLevel(task.Id))</MudText><MudText Typo="Typo.caption">Category: @task.Category</MudText></CardHeaderContent></MudCardHeader>
+                    <MudCardContent Class="pa-2">
+                        <MudText Typo="Typo.body2" Class="mb-1">@task.Description</MudText>
+                        <MudText Typo="Typo.caption">Activity XP/sec: @task.XpGainPerTick.ToString("N1") | Adventurer XP/sec: @task.PlayerXpRewardPerTick.ToString("N1")</MudText>
                         @if (!isAvailable && !string.IsNullOrEmpty(GameState.GetTaskRequirementsTooltip(task.Id)))
                         {
-                            <MudTooltip Text="@GameState.GetTaskRequirementsTooltip(task.Id)" MaxWidth="MaxWidth.Medium" Arrow="true" Placement="Placement.Bottom"><MudText Typo="Typo.caption" Color="Color.Warning" Class="mt-1">Locked</MudText></MudTooltip>
+                            <MudTooltip Text="@GameState.GetTaskRequirementsTooltip(task.Id)" MaxWidth="MaxWidth.Small" Arrow="true" Placement="Placement.Bottom"><MudText Typo="Typo.caption" Color="Color.Warning" Class="mt-1">Locked</MudText></MudTooltip>
                         }
                         @if (task.RewardsPerLevel.Any())
                         {
@@ -121,21 +122,19 @@
                         }
                         @if (isAvailable)
                         {
-                            <MudProgressLinear Color="isCurrent ? Color.Info : Color.Default" Striped="isCurrent" Value="@GameState.GetTaskProgressPercent(task.Id)" Class="my-2"><MudText Typo="Typo.caption" Class="px-2">@GameState.GetTaskCurrentXp(task.Id).ToString("N1") / @GameState.CalculateXpForNextLevel(task, GameState.GetTaskLevel(task.Id)).ToString("N0") XP</MudText></MudProgressLinear>
+                            <MudProgressLinear Color="@((MudBlazor.Color)Enum.Parse(typeof(MudBlazor.Color), task.ThemeColor.Split('.').Last(), true))" Striped="isCurrent" Value="@GameState.GetTaskProgressPercent(task.Id)" Class="my-1"><MudText Typo="Typo.caption" Class="px-1">@GameState.GetTaskCurrentXp(task.Id).ToString("N1") / @GameState.CalculateXpForNextLevel(task, GameState.GetTaskLevel(task.Id)).ToString("N0") XP</MudText></MudProgressLinear>
                         }
                     </MudCardContent>
-                    <MudCardActions>
-                        @if (isCurrent)
+                    <MudCardActions Class="pa-1"> @if (isCurrent)
                         {
-                            <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick='() => GameState.SetCurrentTask(null)' FullWidth="true">Cease Activity</MudButton>
+                            <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick='() => GameState.SetCurrentTask(null)' FullWidth="true" Size="Size.Small">Cease Activity</MudButton>
                         }
                         else
                         {
-                            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick='() => GameState.SetCurrentTask(task.Id)' Disabled="!isAvailable || !string.IsNullOrEmpty(GameState.CurrentGameData.CurrentJobId) || !string.IsNullOrEmpty(GameState.CurrentGameData.CurrentEnemyId)" FullWidth="true">Undertake</MudButton>
-                        }
-                    </MudCardActions>
-                </MudCard>
-            </MudItem>
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick='() => GameState.SetCurrentTask(task.Id)' Disabled="!isAvailable || !string.IsNullOrEmpty(GameState.CurrentGameData.CurrentJobId) || !string.IsNullOrEmpty(GameState.CurrentGameData.CurrentEnemyId)" FullWidth="true" Size="Size.Small">Undertake</MudButton>
+                        } </MudCardActions>
+                    </MudCard>
+                </MudItem>
         }
     </MudGrid>
 </MudPaper>

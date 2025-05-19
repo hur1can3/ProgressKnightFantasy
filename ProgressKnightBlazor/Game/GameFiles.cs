@@ -55,6 +55,7 @@ namespace ProgressKnightFantasy.Game.Models
         public GameOptions Options { get; set; } = new GameOptions(); // Potentially for more UI/thematic options
         public double BuyAmount { get; set; } = 1;
         public int MaxTab { get; set; }
+        public string CurrentThemeKey { get; set; } = "default_dark"; // For dynamic theming
 
         // Player Stats & Milestones
         public GameStats Stats { get; set; } = new GameStats();
@@ -131,6 +132,7 @@ namespace ProgressKnightFantasy.Game.Models
         public double BaseMaxXp { get; set; }
         public double XpScalingFactor { get; set; } = 1.1;
         public string Category { get; set; } = "General Training"; // e.g., "Combat Drills", "Arcane Studies", "Wilderness Survival"
+        public string ThemeColor { get; set; } = MudBlazor.Color.Default.ToString();
         public bool IsUnlockedByDefault { get; set; } = false;
         public Dictionary<string, int> Requirements { get; set; } = new Dictionary<string, int>();
         public List<string> Unlocks { get; set; } = new List<string>(); // Can unlock tasks, skills, professions
@@ -149,6 +151,8 @@ namespace ProgressKnightFantasy.Game.Models
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty; // Flavor text
         public string Category { get; set; } = "General"; // e.g., "Combat", "Magic", "Crafting", "Social"
+        public string ThemeColor { get; set; } = MudBlazor.Color.Default.ToString();
+        public string ThemeKey { get; set; } = "default_dark";
         public bool IsUnlockedByDefault { get; set; } = false;
         public string EffectDescription { get; set; } = string.Empty; // Describes the skill's mechanical effect
     }
@@ -232,6 +236,8 @@ namespace ProgressKnightFantasy.Game.Models
         public string Name { get; set; } = string.Empty; // e.g., "Village Guard", "Adept Herbalist", "Battle Mage"
         public string Description { get; set; } = string.Empty;
         public string Category { get; set; } = "General"; // e.g., "Martial", "Arcane", "Crafting", "Gathering"
+        public string ThemeColor { get; set; } = MudBlazor.Color.Default.ToString();
+        public string ThemeKey { get; set; } = "default_dark";
         public double BaseIncomePerTick { get; set; } = 1; // "Income" can be coins, or perhaps other resources
         public double XpPerTick { get; set; } = 1; // Profession XP
         public double BaseMaxXp { get; set; } = 100;
@@ -289,6 +295,7 @@ namespace ProgressKnightFantasy.Game
     using System.Collections.Generic;
     using System.Linq;
     using System;
+    using MudBlazor;
 
     public static class GameDataDefinitions
     {
@@ -297,48 +304,47 @@ namespace ProgressKnightFantasy.Game
 
         public static readonly List<TaskDefinition> Tasks = new List<TaskDefinition>
         {
-            new TaskDefinition {
+          new TaskDefinition {
                 Id = "basic_sword_drills", Name = "Basic Sword Drills", Description = "Practice basic stances and swings with a wooden sword.",
-                XpGainPerTick = 1.0, PlayerXpRewardPerTick = 0.2, BaseMaxXp = 100, XpScalingFactor = 1.15, Category = "Combat Training",
-                IsUnlockedByDefault = true, RewardsPerLevel = new Dictionary<string, double> { { "coins", 5 } },
+                XpGainPerTick = 1.5, PlayerXpRewardPerTick = 0.3, BaseMaxXp = 80, XpScalingFactor = 1.12, Category = "Combat Training", ThemeColor = Color.Error.ToString(),
+                IsUnlockedByDefault = true, RewardsPerLevel = new Dictionary<string, double> { { "coins", 7 } },
                 Unlocks = new List<string> { "task:patrol_village_outskirts", "skill:swordsmanship", "job:village_aspirant" }
             },
             new TaskDefinition {
                 Id = "study_ancient_runes", Name = "Study Ancient Runes", Description = "Decipher forgotten symbols of power from weathered tablets.",
-                XpGainPerTick = 0.8, PlayerXpRewardPerTick = 0.3, BaseMaxXp = 150, XpScalingFactor = 1.2, Category = "Arcane Studies",
-                IsUnlockedByDefault = true, RewardsPerLevel = new Dictionary<string, double> { { "skill:arcane_lore_xp_direct", 0.2 } },
+                XpGainPerTick = 1.2, PlayerXpRewardPerTick = 0.4, BaseMaxXp = 120, XpScalingFactor = 1.18, Category = "Arcane Studies", ThemeColor = Color.Primary.ToString(),
+                IsUnlockedByDefault = true, RewardsPerLevel = new Dictionary<string, double> { { "skill:arcane_lore_xp_direct", 0.25 } },
                 Unlocks = new List<string> { "skill:spellcraft", "job:apprentice_scribe" }
             },
             new TaskDefinition {
                 Id = "forage_for_herbs", Name = "Forage for Herbs", Description = "Search the nearby woods and fields for valuable medicinal plants.",
-                XpGainPerTick = 0.6, PlayerXpRewardPerTick = 0.15, BaseMaxXp = 80, XpScalingFactor = 1.1, Category = "Wilderness Survival",
-                IsUnlockedByDefault = true, RewardsPerLevel = new Dictionary<string, double> { { "coins", 3 } },
+                XpGainPerTick = 1.0, PlayerXpRewardPerTick = 0.2, BaseMaxXp = 70, XpScalingFactor = 1.08, Category = "Wilderness Survival", ThemeColor = Color.Success.ToString(),
+                IsUnlockedByDefault = true, RewardsPerLevel = new Dictionary<string, double> { { "coins", 4 } },
                 Unlocks = new List<string> { "skill:herbalism", "task:brew_minor_potion" }
             },
              new TaskDefinition {
                 Id = "patrol_village_outskirts", Name = "Patrol Village Outskirts", Description = "Keep an eye out for wild beasts or goblin scouts near the village.",
-                XpGainPerTick = 0.7, PlayerXpRewardPerTick = 0.25, BaseMaxXp = 120, XpScalingFactor = 1.18, Category = "Guard Duty",
+                XpGainPerTick = 1.1, PlayerXpRewardPerTick = 0.3, BaseMaxXp = 100, XpScalingFactor = 1.15, Category = "Guard Duty", ThemeColor = Color.Warning.ToString(),
                 Requirements = new Dictionary<string, int>{{"task:basic_sword_drills", 2}},
                 Unlocks = new List<string> { "job:village_guard" }
             },
              new TaskDefinition {
                 Id = "brew_minor_potion", Name = "Brew Minor Healing Draught", Description = "Attempt to create a simple potion to mend minor wounds.",
-                XpGainPerTick = 0.5, PlayerXpRewardPerTick = 0.1, BaseMaxXp = 200, XpScalingFactor = 1.25, Category = "Alchemy",
+                XpGainPerTick = 0.8, PlayerXpRewardPerTick = 0.15, BaseMaxXp = 180, XpScalingFactor = 1.22, Category = "Alchemy", ThemeColor = Color.Info.ToString(),
                 Requirements = new Dictionary<string, int>{{"skill:herbalism", 1}},
                 Unlocks = new List<string> { "skill:alchemy" }
             },
         };
         public static readonly List<SkillDefinition> Skills = new List<SkillDefinition>
         {
-            new SkillDefinition { Id = "swordsmanship", Name = "Swordsmanship", Description = "Proficiency with blades, from daggers to greatswords.", Category = "Combat", EffectDescription = "+1 Attack per 2 levels." },
-            new SkillDefinition { Id = "arcane_lore", Name = "Arcane Lore", Description = "Knowledge of magical principles, history, and artifacts.", Category = "Magic", EffectDescription = "Unlocks magical tasks & professions, may improve spell research." },
-            new SkillDefinition { Id = "herbalism", Name = "Herbalism", Description = "The art of identifying, gathering, and preparing medicinal or mystical plants.", Category = "Crafting", EffectDescription = "Improves potion effects or gathering yields from foraging." },
-            new SkillDefinition { Id = "spellcraft", Name = "Spellcraft", Description = "The practical art of weaving magical energies into spells.", Category = "Magic", EffectDescription = "Increases spell effectiveness and reduces mana costs." },
-            new SkillDefinition { Id = "fortitude", Name = "Fortitude", Description = "Resilience against hardship, pain, and physical trauma.", Category = "Physical", IsUnlockedByDefault = true, EffectDescription = "+5 Max HP & +0.2 Defense per level." },
-            new SkillDefinition { Id = "alchemy", Name = "Alchemy", Description = "Transmuting substances and brewing potent concoctions and elixirs.", Category = "Crafting", EffectDescription = "Allows crafting of powerful potions, oils, and other magical items." },
-            new SkillDefinition { Id = "orc_slaying_tactics", Name = "Orc Slaying Tactics", Description = "Specialized techniques for effectively fighting orc-kind.", Category = "Combat", EffectDescription = "+10% damage against Orcs per level." },
-            new SkillDefinition { Id = "diligence", Name = "Diligence", Description = "A strong work ethic and unwavering focus.", Category = "Work Ethic", IsUnlockedByDefault = true, EffectDescription = "+1% Profession XP gain per level." }
-
+            new SkillDefinition { Id = "swordsmanship", Name = "Swordsmanship", Description = "Proficiency with blades.", Category = "Combat", ThemeColor = Colors.Red.Default, ThemeKey="warrior_theme", EffectDescription = "+1 Attack per 2 levels." },
+            new SkillDefinition { Id = "arcane_lore", Name = "Arcane Lore", Description = "Knowledge of magical principles.", Category = "Magic", ThemeColor = Colors.Blue.Default, ThemeKey="mage_theme", EffectDescription = "Unlocks magical tasks & professions." },
+            new SkillDefinition { Id = "herbalism", Name = "Herbalism", Description = "Identifying and using medicinal plants.", Category = "Crafting", ThemeColor = Colors.Green.Default, ThemeKey="druid_theme", EffectDescription = "Improves potion effects or gathering yields." },
+            new SkillDefinition { Id = "spellcraft", Name = "Spellcraft", Description = "The art of weaving magic.", Category = "Magic", ThemeColor = Colors.Purple.Default, ThemeKey="warlock_theme", EffectDescription = "Increases spell effectiveness." },
+            new SkillDefinition { Id = "fortitude", Name = "Fortitude", Description = "Resilience and physical toughness.", Category = "Physical", IsUnlockedByDefault = true, ThemeColor = Colors.Brown.Default, ThemeKey="default_dark", EffectDescription = "+5 Max HP & +0.2 Defense per level." },
+            new SkillDefinition { Id = "alchemy", Name = "Alchemy", Description = "Transmuting substances and brewing concoctions.", Category = "Crafting", ThemeColor = Colors.LightGreen.Accent3, ThemeKey="monk_theme", EffectDescription = "Allows crafting of powerful items." },
+            new SkillDefinition { Id = "orc_slaying_tactics", Name = "Orc Slaying Tactics", Description = "Specialized techniques for fighting orcs.", Category = "Combat", ThemeColor = Colors.Orange.Darken2, ThemeKey="hunter_theme", EffectDescription = "+10% damage against Orcs per level." },
+            new SkillDefinition { Id = "diligence", Name = "Diligence", Description = "A strong work ethic.", Category = "Work Ethic", IsUnlockedByDefault = true, ThemeColor = Colors.Pink.Lighten2, ThemeKey="paladin_theme", EffectDescription = "+1% Profession XP gain per level." }
         };
         public static readonly List<EvilPerkDefinition> EvilPerks = new List<EvilPerkDefinition> // "Echoes of Power"
         {
@@ -407,36 +413,34 @@ namespace ProgressKnightFantasy.Game
             new EnemyDefinition { Id = "orc_grunt", Name = "Orc Grunt", MaxHealth = 80, Attack = 12, Defense = 5, PlayerXpReward = 45, CoinReward = 25, RequiredPlayerLevel = 5, Faction = "Orc Clans", Description="A brutish warrior of the green-skin hordes, wielding a notched axe." },
             new EnemyDefinition { Id = "skeletal_warrior", Name = "Skeletal Warrior", MaxHealth = 60, Attack = 10, Defense = 8, PlayerXpReward = 35, CoinReward = 18, RequiredPlayerLevel = 4, Faction = "Undead", Description="Animated bones of a long-dead soldier, driven by dark magic and clattering with every move." }
         };
-        public static readonly List<JobDefinition> Jobs = new List<JobDefinition> // Professions/Callings
+        public static readonly List<JobDefinition> Jobs = new List<JobDefinition>
         {
             new JobDefinition {
-                Id = "village_aspirant", Name = "Village Aspirant", Description = "Help around the village with various menial tasks like mucking stables or delivering messages.", Category = "General Labor",
-                BaseIncomePerTick = 0.15, XpPerTick = 0.4, BaseMaxXp = 60, XpScalingFactor = 1.25, MaxLevel = 5,
+                Id = "village_aspirant", Name = "Village Aspirant", Description = "Help around the village with various menial tasks.", Category = "General Labor", ThemeColor = Colors.BlueGray.Default, ThemeKey="default_dark",
+                BaseIncomePerTick = 0.25, XpPerTick = 0.6, BaseMaxXp = 50, XpScalingFactor = 1.2, MaxLevel = 5,
                 IsUnlockedByDefault = false, PlayerLevelRequirement = 1,
                 TaskRequirements = new Dictionary<string, int>{{"task:basic_sword_drills", 1}, {"task:forage_for_herbs", 1}},
                 SpeedSkillModifierId = "diligence", SpeedSkillEffectPerLevel = 0.015,
                 Unlocks = new List<string> { "job:village_guard", "job:apprentice_herbalist" }
             },
             new JobDefinition {
-                Id = "apprentice_scribe", Name = "Apprentice Scribe", Description = "Copy scrolls, study ancient languages, and assist the local loremaster.", Category = "Scholarly",
-                BaseIncomePerTick = 0.1, XpPerTick = 0.6, BaseMaxXp = 100, XpScalingFactor = 1.3, MaxLevel = 7,
+                Id = "apprentice_scribe", Name = "Apprentice Scribe", Description = "Copy scrolls and learn ancient languages.", Category = "Scholarly", ThemeColor = Colors.Blue.Lighten2, ThemeKey="mage_theme",
+                BaseIncomePerTick = 0.15, XpPerTick = 0.8, BaseMaxXp = 90, XpScalingFactor = 1.28, MaxLevel = 7,
                 PlayerLevelRequirement = 2, SkillRequirements = new Dictionary<string, int> { { "arcane_lore", 1 } },
                 IncomeSkillModifierId = "arcane_lore", IncomeSkillEffectPerLevel = 0.02,
                 SpeedSkillModifierId = "diligence", SpeedSkillEffectPerLevel = 0.01,
-                Unlocks = new List<string> { /* "job:adept_scholar" */ }
             },
             new JobDefinition {
-                Id = "village_guard", Name = "Village Guard", Description = "Protect the village from minor threats and keep the peace.", Category = "Martial",
-                BaseIncomePerTick = 0.3, XpPerTick = 0.5, BaseMaxXp = 150, XpScalingFactor = 1.35, MaxLevel = 8,
+                Id = "village_guard", Name = "Village Guard", Description = "Protect the village from minor threats.", Category = "Martial", ThemeColor = Colors.Red.Lighten1, ThemeKey="warrior_theme",
+                BaseIncomePerTick = 0.4, XpPerTick = 0.7, BaseMaxXp = 130, XpScalingFactor = 1.32, MaxLevel = 8,
                 PlayerLevelRequirement = 4, SkillRequirements = new Dictionary<string, int> { { "swordsmanship", 2 }, {"fortitude", 1} },
                 IncomeSkillModifierId = "swordsmanship", IncomeSkillEffectPerLevel = 0.01,
-                Unlocks = new List<string> { /* "job:sergeant_at_arms", */ "skill:orc_slaying_tactics" }
+                Unlocks = new List<string> { "skill:orc_slaying_tactics" }
             },
              new JobDefinition {
-                Id = "apprentice_herbalist", Name = "Apprentice Herbalist", Description = "Learn to identify, gather, and prepare potent herbs under a master's tutelage.", Category = "Gathering",
-                BaseIncomePerTick = 0.2, XpPerTick = 0.5, BaseMaxXp = 90, XpScalingFactor = 1.2, MaxLevel = 6,
+                Id = "apprentice_herbalist", Name = "Apprentice Herbalist", Description = "Learn to identify and prepare potent herbs.", Category = "Gathering", ThemeColor = Colors.Green.Lighten1, ThemeKey="druid_theme",
+                BaseIncomePerTick = 0.25, XpPerTick = 0.7, BaseMaxXp = 80, XpScalingFactor = 1.18, MaxLevel = 6,
                 PlayerLevelRequirement = 3, SkillRequirements = new Dictionary<string, int> { { "herbalism", 2 } },
-                Unlocks = new List<string> { /* "job:master_alchemist" */ }
             }
         };
         public static readonly List<ChallengeDefinition> Challenges = new List<ChallengeDefinition>
@@ -485,6 +489,84 @@ namespace ProgressKnightFantasy.Game
 }
 
 // =============================================================
+// File: ProgressKnightFantasy/Services/ThemeService.cs
+// =============================================================
+namespace ProgressKnightFantasy.Services
+{
+    using MudBlazor;
+    using System;
+    using System.Collections.Generic;
+    using static MudBlazor.CategoryTypes;
+
+    public class ThemeService
+    {
+        public MudTheme CurrentTheme { get; private set; }
+        public event Action? OnThemeChanged;
+
+        public readonly Dictionary<string, MudTheme> AvailableThemes = new Dictionary<string, MudTheme>();
+
+        public ThemeService()
+        {
+            AvailableThemes["default_dark"] = new MudTheme()
+            {
+                PaletteDark = new PaletteDark() { Primary = Colors.BlueGray.Lighten1, Secondary = Colors.Brown.Lighten2, Background = "#303030", AppbarBackground = Colors.BlueGray.Darken4, DrawerBackground = "#272727", Surface = Colors.Gray.Darken3, TextPrimary = Colors.Shades.White, TextSecondary = Colors.BlueGray.Lighten2, ActionDefault = Colors.BlueGray.Lighten3 },
+                Typography = GetFantasyTypography(),
+                LayoutProperties = new LayoutProperties() { DefaultBorderRadius = "6px" }
+            };
+            AvailableThemes["default_light"] = new MudTheme()
+            {
+                PaletteLight = new PaletteLight() { Primary = Colors.Brown.Default, Secondary = Colors.Orange.Darken2, Background = "#F5F5DC", AppbarBackground = Colors.Brown.Lighten1, DrawerBackground = "#FAF0E6", Surface = Colors.Shades.White, TextPrimary = Colors.Brown.Darken4, TextSecondary = Colors.Brown.Darken2, ActionDefault = Colors.Brown.Darken1 },
+                Typography = GetFantasyTypography(),
+                LayoutProperties = new LayoutProperties() { DefaultBorderRadius = "6px" }
+            };
+            AvailableThemes["warrior_theme"] = new MudTheme() { PaletteDark = new PaletteDark() { Primary = "#C69B6D", Secondary = Colors.Red.Accent4, AppbarBackground = "#4A3B31", Surface = "#5C4B41" }, Typography = GetFantasyTypography(), LayoutProperties = new LayoutProperties() { DefaultBorderRadius = "6px" } };
+            AvailableThemes["mage_theme"] = new MudTheme() { PaletteDark = new PaletteDark() { Primary = "#3FC7EB", Secondary = Colors.Purple.Accent2, AppbarBackground = "#2C3E50", Surface = "#3E5062" }, Typography = GetFantasyTypography(), LayoutProperties = new LayoutProperties() { DefaultBorderRadius = "6px" } };
+            AvailableThemes["druid_theme"] = new MudTheme() { PaletteDark = new PaletteDark() { Primary = "#FF7C0A", Secondary = Colors.Green.Darken2, AppbarBackground = "#4A3128", Surface = "#5C4138" }, Typography = GetFantasyTypography(), LayoutProperties = new LayoutProperties() { DefaultBorderRadius = "6px" } };
+            AvailableThemes["warlock_theme"] = new MudTheme() { PaletteDark = new PaletteDark() { Primary = "#8788EE", Secondary = Colors.Green.Accent4, AppbarBackground = "#3D2C50", Surface = "#4F3E62" }, Typography = GetFantasyTypography(), LayoutProperties = new LayoutProperties() { DefaultBorderRadius = "6px" } };
+            AvailableThemes["hunter_theme"] = new MudTheme() { PaletteDark = new PaletteDark() { Primary = "#AAD372", Secondary = Colors.Brown.Default, AppbarBackground = "#314A31", Surface = "#415C41" }, Typography = GetFantasyTypography(), LayoutProperties = new LayoutProperties() { DefaultBorderRadius = "6px" } };
+            AvailableThemes["paladin_theme"] = new MudTheme() { PaletteLight = new PaletteLight() { Primary = "#F48CBA", Secondary = Colors.Yellow.Accent4, AppbarBackground = "#FAD0E0", Surface = "#FFF0F5" }, Typography = GetFantasyTypography(), LayoutProperties = new LayoutProperties() { DefaultBorderRadius = "6px" } };
+            AvailableThemes["monk_theme"] = new MudTheme() { PaletteDark = new PaletteDark() { Primary = "#00FF98", Secondary = Colors.Brown.Lighten1, AppbarBackground = "#004D3B", Surface = "#005F4B" }, Typography = GetFantasyTypography(), LayoutProperties = new LayoutProperties() { DefaultBorderRadius = "6px" } };
+            CurrentTheme = AvailableThemes["default_dark"];
+        }
+
+        private static Typography GetFantasyTypography()
+        {
+            return new Typography()
+            {
+                Default = new DefaultTypography() { FontFamily = new[] { "Cinzel", "serif" }, FontSize = "0.875rem" }, // Slightly smaller default
+                H1 = new H1Typography() { FontFamily = new[] { "MedievalSharp", "cursive" }, FontSize = "3rem" },
+                H2 = new H2Typography() { FontFamily = new[] { "MedievalSharp", "cursive" }, FontSize = "2.5rem" },
+                H3 = new H3Typography() { FontFamily = new[] { "MedievalSharp", "cursive" }, FontSize = "2rem" },
+                H4 = new H4Typography() { FontFamily = new[] { "MedievalSharp", "cursive" }, FontSize = "1.75rem" },
+                H5 = new H5Typography() { FontFamily = new[] { "MedievalSharp", "cursive" }, FontSize = "1.35rem" }, // Adjusted H5
+                H6 = new H6Typography() { FontFamily = new[] { "MedievalSharp", "cursive" }, FontSize = "1.15rem" }, // Adjusted H6
+                Subtitle1 = new Subtitle1Typography() { FontFamily = new[] { "Cinzel", "serif" }, FontSize = "0.95rem" },
+                Subtitle2 = new Subtitle2Typography() { FontFamily = new[] { "Cinzel", "serif" }, FontSize = "0.85rem" },
+                Body1 = new Body1Typography() { FontFamily = new[] { "Cinzel", "serif" }, FontSize = "0.875rem" },
+                Body2 = new Body2Typography() { FontFamily = new[] { "Cinzel", "serif" }, FontSize = "0.8rem" }, // Slightly smaller body2
+                Button = new ButtonTypography() { FontFamily = new[] { "Cinzel", "serif" }, FontSize = "0.8rem" },
+                Caption = new CaptionTypography() { FontFamily = new[] { "Cinzel", "serif" }, FontSize = "0.75rem" },
+                Overline = new OverlineTypography() { FontFamily = new[] { "Cinzel", "serif" } }
+            };
+        }
+
+        public void SetTheme(string themeKey)
+        {
+            if (AvailableThemes.TryGetValue(themeKey, out var newTheme))
+            {
+                CurrentTheme = newTheme;
+                OnThemeChanged?.Invoke();
+            }
+            else if (AvailableThemes.TryGetValue("default_dark", out var defaultTheme))
+            {
+                CurrentTheme = defaultTheme;
+                OnThemeChanged?.Invoke();
+            }
+        }
+    }
+}
+
+// =============================================================
 // File: ProgressKnightFantasy/Services/GameStateService.cs
 // =============================================================
 namespace ProgressKnightFantasy.Services
@@ -503,6 +585,8 @@ namespace ProgressKnightFantasy.Services
     public class GameStateService : IDisposable
     {
         private readonly IJSRuntime _jsRuntime;
+        private readonly ThemeService _themeService;
+
         public GameData CurrentGameData { get; private set; }
         public event Action? OnChange;
         private System.Timers.Timer? _gameLoopTimer;
@@ -518,10 +602,12 @@ namespace ProgressKnightFantasy.Services
         public List<ChallengeDefinition> AllChallenges => GameDataDefinitions.Challenges;
         public IReadOnlyList<string> CombatLog => _combatLog.AsReadOnly();
 
-        public GameStateService(IJSRuntime jsRuntime)
+        public GameStateService(IJSRuntime jsRuntime, ThemeService themeService)
         {
             _jsRuntime = jsRuntime;
+            _themeService = themeService;
             CurrentGameData = new GameData();
+            _themeService.SetTheme(CurrentGameData.CurrentThemeKey);
             InitializeNewGameData(CurrentGameData);
             InitializeGameLoop();
         }
@@ -537,121 +623,13 @@ namespace ProgressKnightFantasy.Services
         }
 
 
-        private void InitializeNewGameData(GameData gameData)
-        {
-            gameData.Days = 365 * 14;
-            gameData.Coins = 30;
-            gameData.CurrentTaskName = null; gameData.CurrentJobId = null;
-            gameData.IsWorking = false; gameData.Paused = gameData.Paused;
-
-            gameData.TaskData.Clear(); gameData.TaskLevels.Clear();
-            gameData.SkillData.Clear(); gameData.ShopItemLevels.Clear();
-            gameData.JobData.Clear(); gameData.JobLevels.Clear();
-            gameData.UnlockedTaskIds.Clear(); gameData.UnlockedSkillIds.Clear(); gameData.UnlockedJobIds.Clear();
-
-            gameData.CurrentEnemyId = null; gameData.CurrentEnemyHealth = 0; _combatLog.Clear();
-            gameData.CurrentChallengeId = string.Empty;
-            gameData.LastTickTime = DateTime.UtcNow;
-
-            gameData.CurrentRun = new RebirthData { PlayerLevel = 0, PlayerXp = 0, TimeThisRun = 0, PlayerCurrentHealth = CalculatePlayerMaxHealth() };
-
-            foreach (var taskDef in AllTasks) { gameData.TaskLevels[taskDef.Id] = 0; gameData.TaskData[taskDef.Id] = 0; if (taskDef.IsUnlockedByDefault) gameData.UnlockedTaskIds.Add(taskDef.Id); }
-
-            int startingSkillLevels = GetEvilPerkLevel("ancestral_memory");
-            foreach (var skillDef in AllSkills)
-            {
-                gameData.SkillData[skillDef.Id] = skillDef.IsUnlockedByDefault ? startingSkillLevels : 0;
-                if (skillDef.IsUnlockedByDefault) gameData.UnlockedSkillIds.Add(skillDef.Id);
-            }
-            foreach (var jobDef in AllJobs) { gameData.JobLevels[jobDef.Id] = 0; gameData.JobData[jobDef.Id] = 0; if (jobDef.IsUnlockedByDefault) gameData.UnlockedJobIds.Add(jobDef.Id); }
-            foreach (var shopItemDef in AllShopItems) { gameData.ShopItemLevels[shopItemDef.Id] = 0; }
-
-            gameData.CurrentRun.PlayerCurrentHealth = CalculatePlayerMaxHealth();
-        }
-
+        private void InitializeNewGameData(GameData gameData) { gameData.Days = 365 * 14; gameData.Coins = 50; gameData.CurrentTaskName = null; gameData.CurrentJobId = null; gameData.IsWorking = false; gameData.Paused = gameData.Paused; gameData.TaskData.Clear(); gameData.TaskLevels.Clear(); gameData.SkillData.Clear(); gameData.ShopItemLevels.Clear(); gameData.JobData.Clear(); gameData.JobLevels.Clear(); gameData.UnlockedTaskIds.Clear(); gameData.UnlockedSkillIds.Clear(); gameData.UnlockedJobIds.Clear(); gameData.CurrentEnemyId = null; gameData.CurrentEnemyHealth = 0; _combatLog.Clear(); gameData.CurrentChallengeId = string.Empty; gameData.LastTickTime = DateTime.UtcNow; gameData.CurrentRun = new RebirthData { PlayerLevel = 0, PlayerXp = 0, TimeThisRun = 0, PlayerCurrentHealth = CalculatePlayerMaxHealth() }; foreach (var taskDef in AllTasks) { gameData.TaskLevels[taskDef.Id] = 0; gameData.TaskData[taskDef.Id] = 0; if (taskDef.IsUnlockedByDefault) gameData.UnlockedTaskIds.Add(taskDef.Id); } int startingSkillLevels = GetEvilPerkLevel("ancestral_memory"); foreach (var skillDef in AllSkills) { gameData.SkillData[skillDef.Id] = skillDef.IsUnlockedByDefault ? startingSkillLevels : 0; if (skillDef.IsUnlockedByDefault) gameData.UnlockedSkillIds.Add(skillDef.Id); } foreach (var jobDef in AllJobs) { gameData.JobLevels[jobDef.Id] = 0; gameData.JobData[jobDef.Id] = 0; if (jobDef.IsUnlockedByDefault) gameData.UnlockedJobIds.Add(jobDef.Id); } foreach (var shopItemDef in AllShopItems) { gameData.ShopItemLevels[shopItemDef.Id] = 0; } gameData.CurrentThemeKey = "default_dark"; gameData.CurrentRun.PlayerCurrentHealth = CalculatePlayerMaxHealth(); }
         private void InitializeGameLoop() { _gameLoopTimer = new System.Timers.Timer(1000); _gameLoopTimer.Elapsed += GameTick; _gameLoopTimer.AutoReset = true; _gameLoopTimer.Enabled = true; }
+        public async Task ProcessOfflineProgress() { OfflineProgressReport.Clear(); if (CurrentGameData.Settings.PauseOffline || CurrentGameData.LastSaveTime == DateTime.MinValue) { CurrentGameData.LastTickTime = DateTime.UtcNow; NotifyStateChanged(); return; } TimeSpan offlineDuration = DateTime.UtcNow - CurrentGameData.LastTickTime; if (offlineDuration.TotalSeconds <= 10) { CurrentGameData.LastTickTime = DateTime.UtcNow; NotifyStateChanged(); return; } int offlineTicks = (int)Math.Min(offlineDuration.TotalSeconds, GameDataDefinitions.MaxOfflineTicksCap); OfflineProgressReport.Add($"You were away for {FormatTimeSpan(offlineDuration)} (Simulated {FormatTimeSpan(TimeSpan.FromSeconds(offlineTicks))} of progress)."); double initialCoins = CurrentGameData.Coins; double initialPlayerXp = CurrentGameData.CurrentRun.PlayerXp; bool wasPaused = CurrentGameData.Paused; CurrentGameData.Paused = false; for (int i = 0; i < offlineTicks; i++) { CurrentGameData.Days += 1.0 / (24 * 60 * 60); CurrentGameData.CurrentRun.TimeThisRun += 1; CurrentGameData.TimePlayedTotal += 1; if (!string.IsNullOrEmpty(CurrentGameData.CurrentChallengeId)) { if (CurrentGameData.CurrentChallengeId == "poverty_challenge" && CurrentGameData.Coins > 100) { OfflineProgressReport.Add("Vow of Poverty failed: coin limit exceeded offline."); break; } } if (!string.IsNullOrEmpty(CurrentGameData.CurrentJobId)) { ProcessJobProgressionOffline(); ProcessPlayerXpGainOffline(); } else if (!string.IsNullOrEmpty(CurrentGameData.CurrentTaskName)) { ProcessTaskProgressionOffline(); ProcessPlayerXpGainOffline(); } } CurrentGameData.Paused = wasPaused; if (CurrentGameData.Coins > initialCoins) { double coinsGainedOffline = CurrentGameData.Coins - initialCoins; OfflineProgressReport.Add($"Gained {coinsGainedOffline:N0} Silver Pieces."); CurrentGameData.Stats.TotalCoinsEarned += (long)coinsGainedOffline; } if (CurrentGameData.CurrentRun.PlayerXp > initialPlayerXp) OfflineProgressReport.Add($"Gained {CurrentGameData.CurrentRun.PlayerXp - initialPlayerXp:N0} Adventurer XP."); CurrentGameData.LastTickTime = DateTime.UtcNow; NotifyStateChanged(); }
+        private void ProcessPlayerXpGainOffline() { if (CurrentGameData.IsWorking) { double playerXpPerTick = 0; if (!string.IsNullOrEmpty(CurrentGameData.CurrentTaskName)) { var taskDef = GetTaskDefinitionById(CurrentGameData.CurrentTaskName); if (taskDef != null) playerXpPerTick = taskDef.PlayerXpRewardPerTick; } if (playerXpPerTick > 0) { CurrentGameData.CurrentRun.PlayerXp += playerXpPerTick; } } double xpForNextPlayerLevel = GameDataDefinitions.CalculatePlayerXpForNextLevel(CurrentGameData.CurrentRun.PlayerLevel); while (CurrentGameData.CurrentRun.PlayerXp >= xpForNextPlayerLevel) { CurrentGameData.CurrentRun.PlayerXp -= xpForNextPlayerLevel; CurrentGameData.CurrentRun.PlayerLevel++; if (CurrentGameData.CurrentRun.PlayerLevel > CurrentGameData.Stats.MaxPlayerLevelAchieved) CurrentGameData.Stats.MaxPlayerLevelAchieved = CurrentGameData.CurrentRun.PlayerLevel; xpForNextPlayerLevel = GameDataDefinitions.CalculatePlayerXpForNextLevel(CurrentGameData.CurrentRun.PlayerLevel); } }
+        private void ProcessTaskProgressionOffline() { if (string.IsNullOrEmpty(CurrentGameData.CurrentTaskName)) { CurrentGameData.IsWorking = false; return; } CurrentGameData.IsWorking = true; var taskDef = GetTaskDefinitionById(CurrentGameData.CurrentTaskName); if (taskDef == null || !IsTaskActuallyAvailable(taskDef.Id)) { CurrentGameData.IsWorking = false; CurrentGameData.CurrentTaskName = null; return; } double currentTaskXp = CurrentGameData.TaskData[taskDef.Id]; currentTaskXp += taskDef.XpGainPerTick; int currentLevel = CurrentGameData.TaskLevels[taskDef.Id]; double xpForNextLevel = CalculateXpForNextLevel(taskDef, currentLevel); while (currentTaskXp >= xpForNextLevel) { currentTaskXp -= xpForNextLevel; currentLevel++; CurrentGameData.TaskLevels[taskDef.Id] = currentLevel; CurrentGameData.Stats.TotalTasksCompleted++; xpForNextLevel = CalculateXpForNextLevel(taskDef, currentLevel); } CurrentGameData.TaskData[taskDef.Id] = currentTaskXp; }
+        private void ProcessJobProgressionOffline() { if (string.IsNullOrEmpty(CurrentGameData.CurrentJobId)) { CurrentGameData.IsWorking = false; return; } var jobDef = GetJobDefinitionById(CurrentGameData.CurrentJobId); if (jobDef == null) { CurrentGameData.IsWorking = false; CurrentGameData.CurrentJobId = null; return; } CurrentGameData.IsWorking = true; double incomeSkillModValue = 0; if (!string.IsNullOrEmpty(jobDef.IncomeSkillModifierId)) incomeSkillModValue = GetSkillLevel(jobDef.IncomeSkillModifierId) * jobDef.IncomeSkillEffectPerLevel; double speedSkillModValue = 0; if (!string.IsNullOrEmpty(jobDef.SpeedSkillModifierId)) speedSkillModValue = GetSkillLevel(jobDef.SpeedSkillModifierId) * jobDef.SpeedSkillEffectPerLevel; double globalJobIncomeMultiplier = 1.0 + (GetShopItemEffectValue("JobIncomeMultiplier_Global") / 100.0) + (GetEvilPerkEffectValue("JobIncomeGlobalBoost") / 100.0); double categoryJobIncomeMultiplier = 1.0 + (GetShopItemEffectValue($"JobIncomeMultiplier_Category_{jobDef.Category}") / 100.0); double globalJobXpMultiplier = 1.0 + (GetShopItemEffectValue("JobXpMultiplier_Global") / 100.0) + (GetEvilPerkEffectValue("JobXpGlobalBoost") / 100.0); double actualIncome = jobDef.BaseIncomePerTick * (1 + incomeSkillModValue) * globalJobIncomeMultiplier * categoryJobIncomeMultiplier; CurrentGameData.Coins += actualIncome; double actualJobXpGain = jobDef.XpPerTick * (1 + speedSkillModValue) * globalJobXpMultiplier; CurrentGameData.JobData[jobDef.Id] += actualJobXpGain; int currentJobLevel = GetJobLevel(jobDef.Id); if (currentJobLevel < jobDef.MaxLevel) { double xpForNextJobLevel = CalculateJobXpForNextLevel(jobDef, currentJobLevel); while (CurrentGameData.JobData[jobDef.Id] >= xpForNextJobLevel && currentJobLevel < jobDef.MaxLevel) { CurrentGameData.JobData[jobDef.Id] -= xpForNextJobLevel; currentJobLevel++; CurrentGameData.JobLevels[jobDef.Id] = currentJobLevel; if (currentJobLevel > (CurrentGameData.Stats.HighestJobLevelAchieved.TryGetValue(jobDef.Id, out var highLvl) ? highLvl : 0)) CurrentGameData.Stats.HighestJobLevelAchieved[jobDef.Id] = currentJobLevel; if (currentJobLevel == jobDef.MaxLevel) CurrentGameData.Stats.TotalProfessionsMastered++; if (currentJobLevel < jobDef.MaxLevel) xpForNextJobLevel = CalculateJobXpForNextLevel(jobDef, currentJobLevel); else CurrentGameData.JobData[jobDef.Id] = 0; } } }
 
-        public async Task ProcessOfflineProgress()
-        {
-            OfflineProgressReport.Clear();
-            if (CurrentGameData.Settings.PauseOffline || CurrentGameData.LastSaveTime == DateTime.MinValue) { CurrentGameData.LastTickTime = DateTime.UtcNow; NotifyStateChanged(); return; }
-            TimeSpan offlineDuration = DateTime.UtcNow - CurrentGameData.LastTickTime;
-            if (offlineDuration.TotalSeconds <= 10) { CurrentGameData.LastTickTime = DateTime.UtcNow; NotifyStateChanged(); return; }
-
-            int offlineTicks = (int)Math.Min(offlineDuration.TotalSeconds, GameDataDefinitions.MaxOfflineTicksCap);
-            OfflineProgressReport.Add($"You were away for {FormatTimeSpan(offlineDuration)} (Simulated {FormatTimeSpan(TimeSpan.FromSeconds(offlineTicks))} of progress).");
-
-            double initialCoins = CurrentGameData.Coins;
-            double initialPlayerXp = CurrentGameData.CurrentRun.PlayerXp;
-            // Store initial task/job XP for detailed report if needed
-
-            bool wasPaused = CurrentGameData.Paused; CurrentGameData.Paused = false;
-
-            for (int i = 0; i < offlineTicks; i++)
-            {
-                CurrentGameData.Days += 1.0 / (24 * 60 * 60); CurrentGameData.CurrentRun.TimeThisRun += 1; CurrentGameData.TimePlayedTotal += 1;
-
-                if (!string.IsNullOrEmpty(CurrentGameData.CurrentChallengeId))
-                {
-                    if (CurrentGameData.CurrentChallengeId == "poverty_challenge" && CurrentGameData.Coins > 100) { OfflineProgressReport.Add("Vow of Poverty failed: coin limit exceeded offline."); break; }
-                    if (CurrentGameData.CurrentChallengeId == "no_skills_challenge") { /* Skills are already 0 */ }
-                }
-
-                if (!string.IsNullOrEmpty(CurrentGameData.CurrentJobId)) { ProcessJobProgressionOffline(); ProcessPlayerXpGainOffline(); }
-                else if (!string.IsNullOrEmpty(CurrentGameData.CurrentTaskName)) { ProcessTaskProgressionOffline(); ProcessPlayerXpGainOffline(); }
-            }
-            CurrentGameData.Paused = wasPaused;
-
-            if (CurrentGameData.Coins > initialCoins)
-            {
-                double coinsGainedOffline = CurrentGameData.Coins - initialCoins;
-                OfflineProgressReport.Add($"Gained {coinsGainedOffline:N0} Silver Pieces.");
-                CurrentGameData.Stats.TotalCoinsEarned += (long)coinsGainedOffline;
-            }
-            if (CurrentGameData.CurrentRun.PlayerXp > initialPlayerXp) OfflineProgressReport.Add($"Gained {CurrentGameData.CurrentRun.PlayerXp - initialPlayerXp:N0} Adventurer XP.");
-
-            CurrentGameData.LastTickTime = DateTime.UtcNow; NotifyStateChanged();
-        }
-
-        private void ProcessPlayerXpGainOffline()
-        {
-            if (CurrentGameData.IsWorking)
-            {
-                double playerXpPerTick = 0;
-                if (!string.IsNullOrEmpty(CurrentGameData.CurrentTaskName)) { var taskDef = GetTaskDefinitionById(CurrentGameData.CurrentTaskName); if (taskDef != null) playerXpPerTick = taskDef.PlayerXpRewardPerTick; }
-                if (playerXpPerTick > 0) { double evilPlayerXpBoost = 1.0; double shopPlayerXpBoost = 1.0; CurrentGameData.CurrentRun.PlayerXp += playerXpPerTick * evilPlayerXpBoost * shopPlayerXpBoost; }
-            }
-            double xpForNextPlayerLevel = GameDataDefinitions.CalculatePlayerXpForNextLevel(CurrentGameData.CurrentRun.PlayerLevel);
-            while (CurrentGameData.CurrentRun.PlayerXp >= xpForNextPlayerLevel) { CurrentGameData.CurrentRun.PlayerXp -= xpForNextPlayerLevel; CurrentGameData.CurrentRun.PlayerLevel++; if (CurrentGameData.CurrentRun.PlayerLevel > CurrentGameData.Stats.MaxPlayerLevelAchieved) CurrentGameData.Stats.MaxPlayerLevelAchieved = CurrentGameData.CurrentRun.PlayerLevel; xpForNextPlayerLevel = GameDataDefinitions.CalculatePlayerXpForNextLevel(CurrentGameData.CurrentRun.PlayerLevel); }
-        }
-        private void ProcessTaskProgressionOffline()
-        {
-            if (string.IsNullOrEmpty(CurrentGameData.CurrentTaskName)) { CurrentGameData.IsWorking = false; return; }
-            CurrentGameData.IsWorking = true; var taskDef = GetTaskDefinitionById(CurrentGameData.CurrentTaskName); if (taskDef == null || !IsTaskActuallyAvailable(taskDef.Id)) { CurrentGameData.IsWorking = false; CurrentGameData.CurrentTaskName = null; return; }
-            double currentTaskXp = CurrentGameData.TaskData[taskDef.Id]; double taskXpMultiplier = 1.0; currentTaskXp += taskDef.XpGainPerTick * taskXpMultiplier;
-            int currentLevel = CurrentGameData.TaskLevels[taskDef.Id]; double xpForNextLevel = CalculateXpForNextLevel(taskDef, currentLevel);
-            while (currentTaskXp >= xpForNextLevel) { currentTaskXp -= xpForNextLevel; currentLevel++; CurrentGameData.TaskLevels[taskDef.Id] = currentLevel; /* No ApplyTaskRewards or ProcessUnlocks in simple offline */ xpForNextLevel = CalculateXpForNextLevel(taskDef, currentLevel); CurrentGameData.Stats.TotalTasksCompleted++; }
-            CurrentGameData.TaskData[taskDef.Id] = currentTaskXp;
-        }
-        private void ProcessJobProgressionOffline()
-        {
-            if (string.IsNullOrEmpty(CurrentGameData.CurrentJobId)) { CurrentGameData.IsWorking = false; return; }
-            var jobDef = GetJobDefinitionById(CurrentGameData.CurrentJobId); if (jobDef == null) { CurrentGameData.IsWorking = false; CurrentGameData.CurrentJobId = null; return; }
-            CurrentGameData.IsWorking = true;
-            double incomeSkillModValue = 0; if (!string.IsNullOrEmpty(jobDef.IncomeSkillModifierId)) incomeSkillModValue = GetSkillLevel(jobDef.IncomeSkillModifierId) * jobDef.IncomeSkillEffectPerLevel;
-            double speedSkillModValue = 0; if (!string.IsNullOrEmpty(jobDef.SpeedSkillModifierId)) speedSkillModValue = GetSkillLevel(jobDef.SpeedSkillModifierId) * jobDef.SpeedSkillEffectPerLevel;
-            double globalJobIncomeMultiplier = 1.0 + (GetShopItemEffectValue("JobIncomeMultiplier_Global") / 100.0) + (GetEvilPerkEffectValue("JobIncomeGlobalBoost") / 100.0);
-            double categoryJobIncomeMultiplier = 1.0 + (GetShopItemEffectValue($"JobIncomeMultiplier_Category_{jobDef.Category}") / 100.0);
-            double globalJobXpMultiplier = 1.0 + (GetShopItemEffectValue("JobXpMultiplier_Global") / 100.0) + (GetEvilPerkEffectValue("JobXpGlobalBoost") / 100.0);
-            double actualIncome = jobDef.BaseIncomePerTick * (1 + incomeSkillModValue) * globalJobIncomeMultiplier * categoryJobIncomeMultiplier; CurrentGameData.Coins += actualIncome; // CurrentGameData.Stats.TotalCoinsEarned += (long)actualIncome; // This is done in ProcessOfflineProgress summary
-            double actualJobXpGain = jobDef.XpPerTick * (1 + speedSkillModValue) * globalJobXpMultiplier; CurrentGameData.JobData[jobDef.Id] += actualJobXpGain;
-            int currentJobLevel = GetJobLevel(jobDef.Id);
-            if (currentJobLevel < jobDef.MaxLevel)
-            {
-                double xpForNextJobLevel = CalculateJobXpForNextLevel(jobDef, currentJobLevel);
-                while (CurrentGameData.JobData[jobDef.Id] >= xpForNextJobLevel && currentJobLevel < jobDef.MaxLevel) { CurrentGameData.JobData[jobDef.Id] -= xpForNextJobLevel; currentJobLevel++; CurrentGameData.JobLevels[jobDef.Id] = currentJobLevel; if (currentJobLevel > (CurrentGameData.Stats.HighestJobLevelAchieved.TryGetValue(jobDef.Id, out var highLvl) ? highLvl : 0)) CurrentGameData.Stats.HighestJobLevelAchieved[jobDef.Id] = currentJobLevel; if (currentJobLevel == jobDef.MaxLevel) CurrentGameData.Stats.TotalProfessionsMastered++; if (currentJobLevel < jobDef.MaxLevel) xpForNextJobLevel = CalculateJobXpForNextLevel(jobDef, currentJobLevel); else CurrentGameData.JobData[jobDef.Id] = 0; }
-            }
-        }
 
         private void GameTick(object? sender, ElapsedEventArgs e)
         {

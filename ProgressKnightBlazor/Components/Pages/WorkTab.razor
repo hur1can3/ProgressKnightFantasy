@@ -2,74 +2,76 @@
 @inherits GameTabPageBase
 @using ProgressKnightFantasy.Game.Models
 
-<MudPaper Class="pa-4" Elevation="0">
+<MudPaper Class="pa-2" Elevation="0">
     <MudText Typo="Typo.h4" GutterBottom="true">Professions & Callings</MudText>
-    <MudText Typo="Typo.subtitle1" Class="mb-4">Dedicate yourself to a profession to earn a living and master its arts.</MudText>
+    <MudText Typo="Typo.subtitle1" Class="mb-3">Dedicate yourself to a profession to earn a living and master its arts.</MudText>
 
     @if (!string.IsNullOrEmpty(GameState.CurrentGameData.CurrentJobId))
     {
         var currentJobDef = GameState.GetJobDefinitionById(GameState.CurrentGameData.CurrentJobId);
         if (currentJobDef != null)
         {
-            <MudPaper Class="pa-3 mb-4" Elevation="2">
+            <MudPaper Class="pa-2 mb-3" Elevation="1">
                 <MudText Typo="Typo.h6">Current Profession: @currentJobDef.Name (Rank: @GameState.GetJobLevel(currentJobDef.Id))</MudText>
-                <MudProgressLinear Color="Color.Primary" Value="@GameState.GetJobProgressPercent(currentJobDef.Id)" Class="my-2">
-                    <MudText Typo="Typo.caption" Class="px-2">@GameState.GetJobCurrentXp(currentJobDef.Id).ToString("N1") / @GameState.CalculateJobXpForNextLevel(currentJobDef, GameState.GetJobLevel(currentJobDef.Id)).ToString("N0") XP</MudText>
+                <MudProgressLinear Color="@((MudBlazor.Color)Enum.Parse(typeof(MudBlazor.Color), currentJobDef.ThemeColor.Split('.').Last(), true))" Value="@GameState.GetJobProgressPercent(currentJobDef.Id)" Class="my-1">
+                    <MudText Typo="Typo.caption" Class="px-1">@GameState.GetJobCurrentXp(currentJobDef.Id).ToString("N1") / @GameState.CalculateJobXpForNextLevel(currentJobDef, GameState.GetJobLevel(currentJobDef.Id)).ToString("N0") XP</MudText>
                 </MudProgressLinear>
-                <MudButton Variant="Variant.Outlined" OnClick="GameState.StopJob" FullWidth="true">Cease Profession</MudButton>
+                <MudButton Variant="Variant.Outlined" OnClick="GameState.StopJob" FullWidth="true" Size="Size.Small">Cease Profession</MudButton>
             </MudPaper>
         }
     }
     else if (!string.IsNullOrEmpty(GameState.CurrentGameData.CurrentTaskName))
     {
-        <MudAlert Severity="Severity.Info" Class="mb-3">Currently busy with activity: @GameState.GetTaskDefinitionById(GameState.CurrentGameData.CurrentTaskName)?.Name. Cease activity to pick a profession.</MudAlert>
+        <MudAlert Severity="Severity.Info" Dense="true" Class="mb-2">Currently busy with activity: @GameState.GetTaskDefinitionById(GameState.CurrentGameData.CurrentTaskName)?.Name. Cease activity to pick a profession.</MudAlert>
     }
     else if (!string.IsNullOrEmpty(GameState.CurrentGameData.CurrentEnemyId))
     {
-        <MudAlert Severity="Severity.Warning" Class="mb-3">Currently in combat! Cannot pursue a profession.</MudAlert>
+        <MudAlert Severity="Severity.Warning" Dense="true" Class="mb-2">Currently in combat! Cannot pursue a profession.</MudAlert>
     }
 
-    <MudGrid Spacing="3">
+    <MudGrid Spacing="2">
         @foreach (var job in GameState.AllJobs.OrderBy(j => !GameState.IsJobActuallyAvailable(j.Id)).ThenBy(j => j.Category).ThenBy(j => j.Name))
         {
             bool isAvailable = GameState.IsJobActuallyAvailable(job.Id); bool isCurrent = GameState.CurrentGameData.CurrentJobId == job.Id;
             int jobLevel = GameState.GetJobLevel(job.Id); bool isMaxLevel = jobLevel >= job.MaxLevel;
+            string jobThemeColor = job.ThemeColor.Split('.').Last().ToLower();
+            string availableOpacity = isAvailable ? "" : "opacity: 0.65;";
+            string classStyle = $"border-left: 4px solid var(--mud-palette-{jobThemeColor}); {availableOpacity}";
             <MudItem xs="12" sm="6" md="4">
-                <MudCard Elevation="isCurrent ? 4 : (isAvailable ? 2 : 1)" Style="@(isAvailable ? "" : "opacity: 0.65;")">
-                    <MudCardHeader><CardHeaderContent><MudText Typo="Typo.h6">@job.Name @(jobLevel > 0 ? $"(Rank: {jobLevel})" : "")</MudText><MudText Typo="Typo.caption">Category: @job.Category</MudText></CardHeaderContent></MudCardHeader>
-                    <MudCardContent>
-                        <MudText Typo="Typo.body2">@job.Description</MudText>
-                        <MudText Typo="Typo.body2" Class="mt-1">Base Income/sec: @job.BaseIncomePerTick.ToString("N2") Silver</MudText>
-                        <MudText Typo="Typo.body2">Base Profession XP/sec: @job.XpPerTick.ToString("N1")</MudText>
+                <MudCard Elevation="isCurrent ? 3 : (isAvailable ? 1 : 0)" Style="classStyle" Class="mb-2">
+                    <MudCardHeader Class="pa-2"><CardHeaderContent><MudText Typo="Typo.h6">@job.Name @(jobLevel > 0 ? $"(Rank: {jobLevel})" : "")</MudText><MudText Typo="Typo.caption">Category: @job.Category</MudText></CardHeaderContent></MudCardHeader>
+                    <MudCardContent Class="pa-2">
+                        <MudText Typo="Typo.body2" Class="mb-1">@job.Description</MudText>
+                        <MudText Typo="Typo.caption">Income/sec: @job.BaseIncomePerTick.ToString("N2") | XP/sec: @job.XpPerTick.ToString("N1")</MudText>
                         @if (jobLevel < job.MaxLevel)
                         {
-                            <MudText Typo="Typo.body2">XP for Promotion: @GameState.CalculateJobXpForNextLevel(job, jobLevel).ToString("N0")</MudText>
+                            <MudText Typo="Typo.caption">XP for Promotion: @GameState.CalculateJobXpForNextLevel(job, jobLevel).ToString("N0")</MudText>
                         }
                         else
                         {
-                            <MudText Typo="Typo.body2" Color="Color.Success">Max Rank Achieved (@job.MaxLevel)</MudText>
+                            <MudText Typo="Typo.caption" Color="Color.Success">Max Rank (@job.MaxLevel)</MudText>
                         }
                         @if (!isAvailable && !string.IsNullOrEmpty(GameState.GetJobRequirementsTooltip(job.Id)))
                         {
-                            <MudTooltip Text="@GameState.GetJobRequirementsTooltip(job.Id)" MaxWidth="MaxWidth.Medium" Arrow="true" Placement="Placement.Bottom"><MudText Typo="Typo.caption" Color="Color.Warning" Class="mt-1">Locked</MudText></MudTooltip>
+                            <MudTooltip Text="@GameState.GetJobRequirementsTooltip(job.Id)" MaxWidth="MaxWidth.Small" Arrow="true" Placement="Placement.Bottom"><MudText Typo="Typo.caption" Color="Color.Warning" Class="mt-1">Locked</MudText></MudTooltip>
                         }
                         @if (job.Unlocks.Any())
                         {
-                            <MudText Typo="Typo.caption" Class="mt-1">Unlocks on Promotion: @string.Join(", ", job.Unlocks.Select(u => (GameState.GetJobDefinitionById(u.Substring(u.IndexOf(':') + 1))?.Name ?? GameState.GetSkillDefinitionById(u.Substring(u.IndexOf(':') + 1))?.Name ?? u.Substring(u.IndexOf(':') + 1))))</MudText>
+                            <MudText Typo="Typo.caption" Class="mt-1">Unlocks: @string.Join(", ", job.Unlocks.Select(u => (GameState.GetJobDefinitionById(u.Substring(u.IndexOf(':') + 1))?.Name ?? GameState.GetSkillDefinitionById(u.Substring(u.IndexOf(':') + 1))?.Name ?? u.Substring(u.IndexOf(':') + 1))))</MudText>
                         }
                         @if (isAvailable && !isMaxLevel)
                         {
-                            <MudProgressLinear Color="isCurrent ? Color.Info : Color.Default" Striped="isCurrent" Value="@GameState.GetJobProgressPercent(job.Id)" Class="my-2"><MudText Typo="Typo.caption" Class="px-2">@GameState.GetJobCurrentXp(job.Id).ToString("N1") XP</MudText></MudProgressLinear>
+                            <MudProgressLinear Color="@((MudBlazor.Color)Enum.Parse(typeof(MudBlazor.Color), job.ThemeColor.Split('.').Last(), true))" Striped="isCurrent" Value="@GameState.GetJobProgressPercent(job.Id)" Class="my-1"><MudText Typo="Typo.caption" Class="px-1">@GameState.GetJobCurrentXp(job.Id).ToString("N1") XP</MudText></MudProgressLinear>
                         }
                     </MudCardContent>
-                    <MudCardActions>
+                    <MudCardActions Class="pa-1">
                         @if (isCurrent)
                         {
-                            <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="GameState.StopJob" FullWidth="true">Cease Profession</MudButton>
+                            <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="GameState.StopJob" FullWidth="true" Size="Size.Small">Cease Profession</MudButton>
                         }
                         else
                         {
-                            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="() => GameState.StartJob(job.Id)" Disabled="!isAvailable || isMaxLevel || !string.IsNullOrEmpty(GameState.CurrentGameData.CurrentTaskName) || !string.IsNullOrEmpty(GameState.CurrentGameData.CurrentEnemyId)" FullWidth="true">Begin Profession</MudButton>
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="() => GameState.StartJob(job.Id)" Disabled="!isAvailable || isMaxLevel || !string.IsNullOrEmpty(GameState.CurrentGameData.CurrentTaskName) || !string.IsNullOrEmpty(GameState.CurrentGameData.CurrentEnemyId)" FullWidth="true" Size="Size.Small">Begin Profession</MudButton>
                         }
                     </MudCardActions>
                 </MudCard>
