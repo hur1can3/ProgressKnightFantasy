@@ -13,7 +13,7 @@
         {
             <MudPaper Class="pa-2 mb-3" Elevation="1">
                 <MudText Typo="Typo.h6">Current Profession: @currentJobDef.Name (Rank: @GameState.GetJobLevel(currentJobDef.Id))</MudText>
-                <MudProgressLinear Color="@((MudBlazor.Color)Enum.Parse(typeof(MudBlazor.Color), currentJobDef.ThemeColor.Split('.').Last(), true))" Value="@GameState.GetJobProgressPercent(currentJobDef.Id)" Class="my-1">
+                <MudProgressLinear Size=Size.Large Color="@((MudBlazor.Color)Enum.Parse(typeof(MudBlazor.Color), currentJobDef.ThemeColor.Split('.').Last(), true))" Value="@GameState.GetJobProgressPercent(currentJobDef.Id)" Class="my-1">
                     <MudText Typo="Typo.caption" Class="px-1">@GameState.GetJobCurrentXp(currentJobDef.Id).ToString("N1") / @GameState.CalculateJobXpForNextLevel(currentJobDef, GameState.GetJobLevel(currentJobDef.Id)).ToString("N0") XP</MudText>
                 </MudProgressLinear>
                 <MudButton Variant="Variant.Outlined" OnClick="GameState.StopJob" FullWidth="true" Size="Size.Small">Cease Profession</MudButton>
@@ -61,7 +61,7 @@
                         }
                         @if (isAvailable && !isMaxLevel)
                         {
-                            <MudProgressLinear Color="@((MudBlazor.Color)Enum.Parse(typeof(MudBlazor.Color), job.ThemeColor.Split('.').Last(), true))" Striped="isCurrent" Value="@GameState.GetJobProgressPercent(job.Id)" Class="my-1"><MudText Typo="Typo.caption" Class="px-1">@GameState.GetJobCurrentXp(job.Id).ToString("N1") XP</MudText></MudProgressLinear>
+                            <MudProgressLinear Size="Size.Large" Color="@((MudBlazor.Color)Enum.Parse(typeof(MudBlazor.Color), job.ThemeColor.Split('.').Last(), true))" Striped="isCurrent" Value="@GameState.GetJobProgressPercent(job.Id)" Class="my-1"><MudText Typo="Typo.caption" Class="px-1">@GameState.GetJobCurrentXp(job.Id).ToString("N1") XP</MudText></MudProgressLinear>
                         }
                     </MudCardContent>
                     <MudCardActions Class="pa-1">

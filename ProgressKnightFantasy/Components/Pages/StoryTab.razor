@@ -60,7 +60,7 @@
                     {
                         <MudText Typo="Typo.subtitle1">Undertaking: <strong>@currentTaskDef.Name</strong> (Lvl: @GameState.GetTaskLevel(currentTaskDef.Id))</MudText>
                         <MudText Typo="Typo.body2" Class="mb-1">@currentTaskDef.Description</MudText>
-                        <MudProgressLinear Color="@((MudBlazor.Color)Enum.Parse(typeof(MudBlazor.Color), currentTaskDef.ThemeColor.Split('.').Last(), true))" Value="@GameState.GetTaskProgressPercent(currentTaskDef.Id)" Class="my-1">
+                        <MudProgressLinear Size=Size.Large Color="@((MudBlazor.Color)Enum.Parse(typeof(MudBlazor.Color), currentTaskDef.ThemeColor.Split('.').Last(), true))" Value="@GameState.GetTaskProgressPercent(currentTaskDef.Id)" Class="my-1">
                             <MudText Typo="Typo.caption" Class="px-1">@GameState.GetTaskCurrentXp(currentTaskDef.Id).ToString("N1") / @GameState.CalculateXpForNextLevel(currentTaskDef, GameState.GetTaskLevel(currentTaskDef.Id)).ToString("N0") XP</MudText>
                         </MudProgressLinear>
                         <MudButton Variant="Variant.Outlined" OnClick='() => GameState.SetCurrentTask(null)' FullWidth="true" Size="Size.Small">Cease Activity</MudButton>
@@ -73,7 +73,7 @@
                     {
                         <MudText Typo="Typo.subtitle1">Profession: <strong>@currentJobDef.Name</strong> (Rank: @GameState.GetJobLevel(currentJobDef.Id))</MudText>
                         <MudText Typo="Typo.body2" Class="mb-1">@currentJobDef.Description</MudText>
-                        <MudProgressLinear Color="@((MudBlazor.Color)Enum.Parse(typeof(MudBlazor.Color), currentJobDef.ThemeColor.Split('.').Last(), true))" Value="@GameState.GetJobProgressPercent(currentJobDef.Id)" Class="my-1">
+                        <MudProgressLinear Size=Size.Large Color="@((MudBlazor.Color)Enum.Parse(typeof(MudBlazor.Color), currentJobDef.ThemeColor.Split('.').Last(), true))" Value="@GameState.GetJobProgressPercent(currentJobDef.Id)" Class="my-1">
                             <MudText Typo="Typo.caption" Class="px-1">@GameState.GetJobCurrentXp(currentJobDef.Id).ToString("N1") / @GameState.CalculateJobXpForNextLevel(currentJobDef, GameState.GetJobLevel(currentJobDef.Id)).ToString("N0") XP</MudText>
                         </MudProgressLinear>
                         <MudButton Variant="Variant.Outlined" OnClick='() => GameState.StopJob()' FullWidth="true" Size="Size.Small">Stop Profession</MudButton>
@@ -122,19 +122,21 @@
                         }
                         @if (isAvailable)
                         {
-                            <MudProgressLinear Color="@((MudBlazor.Color)Enum.Parse(typeof(MudBlazor.Color), task.ThemeColor.Split('.').Last(), true))" Striped="isCurrent" Value="@GameState.GetTaskProgressPercent(task.Id)" Class="my-1"><MudText Typo="Typo.caption" Class="px-1">@GameState.GetTaskCurrentXp(task.Id).ToString("N1") / @GameState.CalculateXpForNextLevel(task, GameState.GetTaskLevel(task.Id)).ToString("N0") XP</MudText></MudProgressLinear>
+                            <MudProgressLinear Size="Size.Large" Color="@((MudBlazor.Color)Enum.Parse(typeof(MudBlazor.Color), task.ThemeColor.Split('.').Last(), true))" Striped="isCurrent" Value="@GameState.GetTaskProgressPercent(task.Id)" Class="my-1"><MudText Typo="Typo.caption" Class="px-1">@GameState.GetTaskCurrentXp(task.Id).ToString("N1") / @GameState.CalculateXpForNextLevel(task, GameState.GetTaskLevel(task.Id)).ToString("N0") XP</MudText></MudProgressLinear>
                         }
                     </MudCardContent>
-                    <MudCardActions Class="pa-1"> @if (isCurrent)
+                    <MudCardActions Class="pa-1">
+                        @if (isCurrent)
                         {
                             <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick='() => GameState.SetCurrentTask(null)' FullWidth="true" Size="Size.Small">Cease Activity</MudButton>
                         }
                         else
                         {
                             <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick='() => GameState.SetCurrentTask(task.Id)' Disabled="!isAvailable || !string.IsNullOrEmpty(GameState.CurrentGameData.CurrentJobId) || !string.IsNullOrEmpty(GameState.CurrentGameData.CurrentEnemyId)" FullWidth="true" Size="Size.Small">Undertake</MudButton>
-                        } </MudCardActions>
-                    </MudCard>
-                </MudItem>
+                        }
+                    </MudCardActions>
+                </MudCard>
+            </MudItem>
         }
     </MudGrid>
 </MudPaper>

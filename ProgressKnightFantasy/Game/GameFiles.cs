@@ -503,29 +503,53 @@ namespace ProgressKnightFantasy.Services
         public MudTheme CurrentTheme { get; private set; }
         public event Action? OnThemeChanged;
 
+        // Make _availableThemes public for MainLayout to access for simple toggle
         public readonly Dictionary<string, MudTheme> AvailableThemes = new Dictionary<string, MudTheme>();
+
 
         public ThemeService()
         {
             AvailableThemes["default_dark"] = new MudTheme()
             {
-                PaletteDark = new PaletteDark() { Primary = Colors.BlueGray.Lighten1, Secondary = Colors.Brown.Lighten2, Background = "#303030", AppbarBackground = Colors.BlueGray.Darken4, DrawerBackground = "#272727", Surface = Colors.Gray.Darken3, TextPrimary = Colors.Shades.White, TextSecondary = Colors.BlueGray.Lighten2, ActionDefault = Colors.BlueGray.Lighten3 },
+                PaletteDark = new PaletteDark()
+                {
+                    Primary = Colors.BlueGray.Lighten1,
+                    Secondary = Colors.Brown.Lighten2,
+                    Background = "#1E1E1E", // Darker Background
+                    AppbarBackground = Colors.Gray.Darken4,
+                    DrawerBackground = "#242424", // Darker Drawer
+                    Surface = Colors.Gray.Darken3, // Darker Surface
+                    TextPrimary = Colors.Shades.White,
+                    TextSecondary = Colors.Gray.Lighten2,
+                    ActionDefault = Colors.Gray.Lighten3
+                },
                 Typography = GetFantasyTypography(),
                 LayoutProperties = new LayoutProperties() { DefaultBorderRadius = "6px" }
             };
             AvailableThemes["default_light"] = new MudTheme()
             {
-                PaletteLight = new PaletteLight() { Primary = Colors.Brown.Default, Secondary = Colors.Orange.Darken2, Background = "#F5F5DC", AppbarBackground = Colors.Brown.Lighten1, DrawerBackground = "#FAF0E6", Surface = Colors.Shades.White, TextPrimary = Colors.Brown.Darken4, TextSecondary = Colors.Brown.Darken2, ActionDefault = Colors.Brown.Darken1 },
+                PaletteLight = new PaletteLight()
+                {
+                    Primary = Colors.Brown.Default,
+                    Secondary = Colors.Orange.Darken2,
+                    Background = "#C8AD7F", // Darker Parchment/Tan
+                    AppbarBackground = Colors.Brown.Darken1, // Darker Appbar
+                    DrawerBackground = "#E0C9A6", // Darker Drawer
+                    Surface = "#EAE0C8", // Darker Surface
+                    TextPrimary = Colors.Brown.Darken4,
+                    TextSecondary = Colors.Brown.Darken2,
+                    ActionDefault = Colors.Brown.Darken1
+                },
                 Typography = GetFantasyTypography(),
                 LayoutProperties = new LayoutProperties() { DefaultBorderRadius = "6px" }
             };
-            AvailableThemes["warrior_theme"] = new MudTheme() { PaletteDark = new PaletteDark() { Primary = "#C69B6D", Secondary = Colors.Red.Accent4, AppbarBackground = "#4A3B31", Surface = "#5C4B41" }, Typography = GetFantasyTypography(), LayoutProperties = new LayoutProperties() { DefaultBorderRadius = "6px" } };
-            AvailableThemes["mage_theme"] = new MudTheme() { PaletteDark = new PaletteDark() { Primary = "#3FC7EB", Secondary = Colors.Purple.Accent2, AppbarBackground = "#2C3E50", Surface = "#3E5062" }, Typography = GetFantasyTypography(), LayoutProperties = new LayoutProperties() { DefaultBorderRadius = "6px" } };
-            AvailableThemes["druid_theme"] = new MudTheme() { PaletteDark = new PaletteDark() { Primary = "#FF7C0A", Secondary = Colors.Green.Darken2, AppbarBackground = "#4A3128", Surface = "#5C4138" }, Typography = GetFantasyTypography(), LayoutProperties = new LayoutProperties() { DefaultBorderRadius = "6px" } };
-            AvailableThemes["warlock_theme"] = new MudTheme() { PaletteDark = new PaletteDark() { Primary = "#8788EE", Secondary = Colors.Green.Accent4, AppbarBackground = "#3D2C50", Surface = "#4F3E62" }, Typography = GetFantasyTypography(), LayoutProperties = new LayoutProperties() { DefaultBorderRadius = "6px" } };
-            AvailableThemes["hunter_theme"] = new MudTheme() { PaletteDark = new PaletteDark() { Primary = "#AAD372", Secondary = Colors.Brown.Default, AppbarBackground = "#314A31", Surface = "#415C41" }, Typography = GetFantasyTypography(), LayoutProperties = new LayoutProperties() { DefaultBorderRadius = "6px" } };
-            AvailableThemes["paladin_theme"] = new MudTheme() { PaletteLight = new PaletteLight() { Primary = "#F48CBA", Secondary = Colors.Yellow.Accent4, AppbarBackground = "#FAD0E0", Surface = "#FFF0F5" }, Typography = GetFantasyTypography(), LayoutProperties = new LayoutProperties() { DefaultBorderRadius = "6px" } };
-            AvailableThemes["monk_theme"] = new MudTheme() { PaletteDark = new PaletteDark() { Primary = "#00FF98", Secondary = Colors.Brown.Lighten1, AppbarBackground = "#004D3B", Surface = "#005F4B" }, Typography = GetFantasyTypography(), LayoutProperties = new LayoutProperties() { DefaultBorderRadius = "6px" } };
+            AvailableThemes["warrior_theme"] = new MudTheme() { PaletteDark = new PaletteDark() { Primary = "#C69B6D", Secondary = Colors.Red.Accent4, AppbarBackground = "#3B2E25", Surface = "#4A3B31" }, Typography = GetFantasyTypography(), LayoutProperties = new LayoutProperties() { DefaultBorderRadius = "6px" } };
+            AvailableThemes["mage_theme"] = new MudTheme() { PaletteDark = new PaletteDark() { Primary = "#3FC7EB", Secondary = Colors.Purple.Accent2, AppbarBackground = "#1F2B38", Surface = "#2C3E50" }, Typography = GetFantasyTypography(), LayoutProperties = new LayoutProperties() { DefaultBorderRadius = "6px" } };
+            AvailableThemes["druid_theme"] = new MudTheme() { PaletteDark = new PaletteDark() { Primary = "#FF7C0A", Secondary = Colors.Green.Darken2, AppbarBackground = "#3B2720", Surface = "#4A3128" }, Typography = GetFantasyTypography(), LayoutProperties = new LayoutProperties() { DefaultBorderRadius = "6px" } };
+            AvailableThemes["warlock_theme"] = new MudTheme() { PaletteDark = new PaletteDark() { Primary = "#8788EE", Secondary = Colors.Green.Accent4, AppbarBackground = "#2E1F3C", Surface = "#3D2C50" }, Typography = GetFantasyTypography(), LayoutProperties = new LayoutProperties() { DefaultBorderRadius = "6px" } };
+            AvailableThemes["hunter_theme"] = new MudTheme() { PaletteDark = new PaletteDark() { Primary = "#AAD372", Secondary = Colors.Brown.Default, AppbarBackground = "#273B27", Surface = "#314A31" }, Typography = GetFantasyTypography(), LayoutProperties = new LayoutProperties() { DefaultBorderRadius = "6px" } };
+            AvailableThemes["paladin_theme"] = new MudTheme() { PaletteLight = new PaletteLight() { Primary = "#F48CBA", Secondary = Colors.Yellow.Accent4, AppbarBackground = "#EABFD0", Surface = "#FAD0E0" }, Typography = GetFantasyTypography(), LayoutProperties = new LayoutProperties() { DefaultBorderRadius = "6px" } };
+            AvailableThemes["monk_theme"] = new MudTheme() { PaletteDark = new PaletteDark() { Primary = "#00FF98", Secondary = Colors.Brown.Lighten1, AppbarBackground = "#003C2D", Surface = "#004D3B" }, Typography = GetFantasyTypography(), LayoutProperties = new LayoutProperties() { DefaultBorderRadius = "6px" } };
             CurrentTheme = AvailableThemes["default_dark"];
         }
 
@@ -533,20 +557,20 @@ namespace ProgressKnightFantasy.Services
         {
             return new Typography()
             {
-                Default = new DefaultTypography() { FontFamily = new[] { "Cinzel", "serif" }, FontSize = "0.875rem" }, // Slightly smaller default
-                H1 = new H1Typography() { FontFamily = new[] { "MedievalSharp", "cursive" }, FontSize = "3rem" },
-                H2 = new H2Typography() { FontFamily = new[] { "MedievalSharp", "cursive" }, FontSize = "2.5rem" },
-                H3 = new H3Typography() { FontFamily = new[] { "MedievalSharp", "cursive" }, FontSize = "2rem" },
-                H4 = new H4Typography() { FontFamily = new[] { "MedievalSharp", "cursive" }, FontSize = "1.75rem" },
-                H5 = new H5Typography() { FontFamily = new[] { "MedievalSharp", "cursive" }, FontSize = "1.35rem" }, // Adjusted H5
-                H6 = new H6Typography() { FontFamily = new[] { "MedievalSharp", "cursive" }, FontSize = "1.15rem" }, // Adjusted H6
-                Subtitle1 = new Subtitle1Typography() { FontFamily = new[] { "Cinzel", "serif" }, FontSize = "0.95rem" },
-                Subtitle2 = new Subtitle2Typography() { FontFamily = new[] { "Cinzel", "serif" }, FontSize = "0.85rem" },
-                Body1 = new Body1Typography() { FontFamily = new[] { "Cinzel", "serif" }, FontSize = "0.875rem" },
-                Body2 = new Body2Typography() { FontFamily = new[] { "Cinzel", "serif" }, FontSize = "0.8rem" }, // Slightly smaller body2
-                Button = new ButtonTypography() { FontFamily = new[] { "Cinzel", "serif" }, FontSize = "0.8rem" },
-                Caption = new CaptionTypography() { FontFamily = new[] { "Cinzel", "serif" }, FontSize = "0.75rem" },
-                Overline = new OverlineTypography() { FontFamily = new[] { "Cinzel", "serif" } }
+                Default = new DefaultTypography() { FontFamily = new[] { "Roboto", "Helvetica", "Arial", "sans-serif" }, FontSize = "0.875rem" },
+                H1 = new H1Typography() { FontFamily = new[] { "MedievalSharp", "cursive" }, FontSize = "3rem", FontWeight = "400" },
+                H2 = new H2Typography() { FontFamily = new[] { "MedievalSharp", "cursive" }, FontSize = "2.5rem", FontWeight ="400" },
+                H3 = new H3Typography() { FontFamily = new[] { "MedievalSharp", "cursive" }, FontSize = "2rem", FontWeight = "400" },
+                H4 = new H4Typography() { FontFamily = new[] { "MedievalSharp", "cursive" }, FontSize = "1.75rem", FontWeight = "400" },
+                H5 = new H5Typography() { FontFamily = new[] { "MedievalSharp", "cursive" }, FontSize = "1.35rem", FontWeight = "700" }, // Bolder H5
+                H6 = new H6Typography() { FontFamily = new[] { "MedievalSharp", "cursive" }, FontSize = "1.15rem", FontWeight = "700" }, // Bolder H6
+                Subtitle1 = new Subtitle1Typography() { FontFamily = new[] { "Roboto", "Helvetica", "Arial", "sans-serif" }, FontSize = "0.95rem" },
+                Subtitle2 = new Subtitle2Typography() { FontFamily = new[] { "Roboto", "Helvetica", "Arial", "sans-serif" }, FontSize = "0.85rem" },
+                Body1 = new Body1Typography() { FontFamily = new[] { "Roboto", "Helvetica", "Arial", "sans-serif" }, FontSize = "0.875rem" },
+                Body2 = new Body2Typography() { FontFamily = new[] { "Roboto", "Helvetica", "Arial", "sans-serif" }, FontSize = "0.8rem" },
+                Button = new ButtonTypography() { FontFamily = new[] { "Roboto", "Helvetica", "Arial", "sans-serif" }, FontWeight = "500", FontSize = "0.8rem", TextTransform = "none" }, // Normal case buttons
+                Caption = new CaptionTypography() { FontFamily = new[] { "Roboto", "Helvetica", "Arial", "sans-serif" }, FontSize = "0.75rem" },
+                Overline = new OverlineTypography() { FontFamily = new[] { "Roboto", "Helvetica", "Arial", "sans-serif" } }
             };
         }
 
