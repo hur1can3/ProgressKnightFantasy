@@ -2,7 +2,7 @@
 @inherits GameTabPageBase
 @using ProgressKnightFantasy.Game.Models
 
-<MudPaper Class="pa-2" Elevation="0">
+<MudPaper Class="pa-1" Elevation="0">
     <MudText Typo="Typo.h4" GutterBottom="true">Professions & Callings</MudText>
     <MudText Typo="Typo.subtitle1" Class="mb-3">Dedicate yourself to a profession to earn a living and master its arts.</MudText>
 
@@ -29,7 +29,7 @@
         <MudAlert Severity="Severity.Warning" Dense="true" Class="mb-2">Currently in combat! Cannot pursue a profession.</MudAlert>
     }
 
-    <MudGrid Spacing="2">
+    <MudGrid Spacing="1">
         @foreach (var job in GameState.AllJobs.OrderBy(j => !GameState.IsJobActuallyAvailable(j.Id)).ThenBy(j => j.Category).ThenBy(j => j.Name))
         {
             bool isAvailable = GameState.IsJobActuallyAvailable(job.Id); bool isCurrent = GameState.CurrentGameData.CurrentJobId == job.Id;
@@ -39,8 +39,8 @@
             string classStyle = $"border-left: 4px solid var(--mud-palette-{jobThemeColor}); {availableOpacity}";
             <MudItem xs="12" sm="6" md="4">
                 <MudCard Elevation="isCurrent ? 3 : (isAvailable ? 1 : 0)" Style="classStyle" Class="mb-2">
-                    <MudCardHeader Class="pa-2"><CardHeaderContent><MudText Typo="Typo.h6">@job.Name @(jobLevel > 0 ? $"(Rank: {jobLevel})" : "")</MudText><MudText Typo="Typo.caption">Category: @job.Category</MudText></CardHeaderContent></MudCardHeader>
-                    <MudCardContent Class="pa-2">
+                    <MudCardHeader Class="pa-1"><CardHeaderContent><MudText Typo="Typo.h6">@job.Name @(jobLevel > 0 ? $"(Rank: {jobLevel})" : "")</MudText><MudText Typo="Typo.caption">Category: @job.Category</MudText></CardHeaderContent></MudCardHeader>
+                    <MudCardContent Class="pa-1">
                         <MudText Typo="Typo.body2" Class="mb-1">@job.Description</MudText>
                         <MudText Typo="Typo.caption">Income/sec: @job.BaseIncomePerTick.ToString("N2") | XP/sec: @job.XpPerTick.ToString("N1")</MudText>
                         @if (jobLevel < job.MaxLevel)

@@ -2,9 +2,42 @@
 @inherits GameTabPageBase
 @using ProgressKnightFantasy.Game.Models
 
-<MudPaper Class="pa-2" Elevation="0">
+<MudPaper Class="pa-1" Elevation="0">
     <MudText Typo="Typo.h4" GutterBottom="true">Your Saga Begins</MudText>
     <MudText Typo="Typo.subtitle1" Class="mb-1">Adventurer Level: @GameState.CurrentGameData.CurrentRun.PlayerLevel.ToString("N0") (XP: @GameState.CurrentGameData.CurrentRun.PlayerXp.ToString("N1") / @GameDataDefinitions.CalculatePlayerXpForNextLevel(GameState.CurrentGameData.CurrentRun.PlayerLevel).ToString("N0"))</MudText>
+
+    @* Mentor Quest Display *@
+    @{
+        var currentMentorQuest = GameState.GetCurrentMentorQuest();
+        if (currentMentorQuest != null)
+        {
+            <MudPaper Class="pa-2 mb-3" Elevation="2" Style="border-left: 4px solid var(--mud-palette-info);">
+                <MudText Typo="Typo.h6" Color="Color.Info">Mentor's Guidance: @currentMentorQuest.Title</MudText>
+                <MudText Typo="Typo.body2" Class="mb-1"><i>@currentMentorQuest.IntroductionText</i></MudText>
+                <MudText Typo="Typo.subtitle2">Objectives:</MudText>
+                <MudList T="string" Dense="true" Class="ml-n2">
+                    @foreach (var objective in currentMentorQuest.Objectives)
+                    {
+                        bool isMet = false;
+                        switch (objective.Type)
+                        {
+                            case MentorQuestObjectiveType.ReachTaskLevel: isMet = GameState.GetTaskLevel(objective.TargetId) >= objective.RequiredValue; break;
+                            case MentorQuestObjectiveType.ReachSkillLevel: isMet = GameState.GetSkillLevel(objective.TargetId) >= objective.RequiredValue; break;
+                            case MentorQuestObjectiveType.ReachJobLevel: isMet = GameState.GetJobLevel(objective.TargetId) >= objective.RequiredValue; break;
+                            case MentorQuestObjectiveType.EarnCoins: isMet = GameState.CurrentGameData.Coins >= objective.RequiredValue; break;
+                            case MentorQuestObjectiveType.DefeatSpecificBoss: isMet = (objective.TargetId == "forest_guardian_boss" && GameState.CurrentGameData.IsGatekeeperDefeated_ForestGuardian); break;
+                            case MentorQuestObjectiveType.AcquireResource: isMet = GameState.CurrentGameData.Resources.TryGetValue(objective.TargetId, out var rVal) && rVal >= objective.RequiredValue; break;
+                        }
+                        <MudListItem Icon="@(isMet ? Icons.Material.Filled.CheckCircle : Icons.Material.Filled.RadioButtonUnchecked)" IconColor="@(isMet ? Color.Success : Color.Default)">
+                            @objective.Description
+                        </MudListItem>
+                    }
+                </MudList>
+            </MudPaper>
+        }
+    }
+
+
 
     @if (!string.IsNullOrEmpty(GameState.CurrentGameData.CurrentJobId))
     {
@@ -41,7 +74,21 @@
                 <MudText Typo="Typo.h6">Realm Status</MudText>
                 <MudText Typo="Typo.body2">Days Passed: @GameState.CurrentGameData.Days.ToString("N0")</MudText>
                 <MudText Typo="Typo.body2">Silver Pieces: @GameState.CurrentGameData.Coins.ToString("N2")</MudText>
-                <MudText Typo="Typo.body2">Time This Age: @GameState.FormatTimeSpan(TimeSpan.FromSeconds(GameState.CurrentGameData.CurrentRun.TimeThisRun))</MudText>
+                <MudText Typo="Typo.caption">Resources:</MudText>
+                @if (GameState.CurrentGameData.Resources.Any())
+                {
+                    <MudList T="string" Dense="true" Class="ml-n2 pa-0">
+                        @foreach (var resource in GameState.CurrentGameData.Resources.Where(r => r.Value > 0))
+                        {
+                            <MudListItemText Primary="@($"{resource.Key.Replace("_", " ")}: {resource.Value:N1}")" PrimaryTypo="Typo.caption" Dense="true" />
+                        }
+                    </MudList>
+                }
+                else
+                {
+                    <MudText Typo="Typo.caption">None</MudText>
+                }
+                <MudText Typo="Typo.body2" Class="mt-1">Time This Age: @GameState.FormatTimeSpan(TimeSpan.FromSeconds(GameState.CurrentGameData.CurrentRun.TimeThisRun))</MudText>
                 <MudText Typo="Typo.caption">Total Time Chronicled: @GameState.FormatTimeSpan(TimeSpan.FromSeconds(GameState.CurrentGameData.TimePlayedTotal))</MudText>
                 <MudText Typo="Typo.body2">Paused: @GameState.CurrentGameData.Paused</MudText>
                 <MudButton Variant="Variant.Filled" Color="GameState.CurrentGameData.Paused ? Color.Success : Color.Warning" OnClick="GameState.TogglePause" FullWidth="true" Class="mt-2" Size="Size.Small">
@@ -51,7 +98,7 @@
         </MudItem>
 
         <MudItem xs="12" sm="6" md="8">
-            <MudPaper Class="pa-2" Elevation="1" Style="min-height: 190px;">
+            <MudPaper Class="pa-1" Elevation="1" Style="min-height: 190px;">
                 <MudText Typo="Typo.h6">Current Focus</MudText>
                 @if (!string.IsNullOrEmpty(GameState.CurrentGameData.CurrentTaskName))
                 {
@@ -104,8 +151,8 @@
 
             <MudItem xs="12" sm="6" md="4">
                 <MudCard Elevation="isCurrent ? 3 : (isAvailable ? 1 : 0)" Style="classStyle" Class="mb-2">
-                    <MudCardHeader Class="pa-2"><CardHeaderContent><MudText Typo="Typo.h6">@task.Name (Lvl: @GameState.GetTaskLevel(task.Id))</MudText><MudText Typo="Typo.caption">Category: @task.Category</MudText></CardHeaderContent></MudCardHeader>
-                    <MudCardContent Class="pa-2">
+                    <MudCardHeader Class="pa-1"><CardHeaderContent><MudText Typo="Typo.h6">@task.Name (Lvl: @GameState.GetTaskLevel(task.Id))</MudText><MudText Typo="Typo.caption">Category: @task.Category</MudText></CardHeaderContent></MudCardHeader>
+                    <MudCardContent Class="pa-1">
                         <MudText Typo="Typo.body2" Class="mb-1">@task.Description</MudText>
                         <MudText Typo="Typo.caption">Activity XP/sec: @task.XpGainPerTick.ToString("N1") | Adventurer XP/sec: @task.PlayerXpRewardPerTick.ToString("N1")</MudText>
                         @if (!isAvailable && !string.IsNullOrEmpty(GameState.GetTaskRequirementsTooltip(task.Id)))
